@@ -1,0 +1,16 @@
+export(
+forecast.hts,
+plot.hts,
+accuracy.hts,
+hts
+)
+
+S3method(forecast,hts)
+S3method(plot,hts)
+S3method(accuracy,hts)
+S3method(print,hts)
+
+import(forecast)
+import(SparseM)
+import(grDevices)
+importFrom(stats)
