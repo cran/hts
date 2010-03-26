@@ -31,7 +31,7 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
         for (i in 1:n.s)
         {
             if(fmethod=="ets")
-                p.f.mat[,i] <- forecast(fulldata$gma[,i], h=h, additive.only=TRUE,...)$mean
+                p.f.mat[,i] <- forecast(ets(fulldata$gma[,i]), h=h, additive.only=TRUE,...)$mean
             else if(fmethod=="rw")
                 p.f.mat[,i] <- rwf(fulldata$gma[,i],h=h)
             else if(fmethod=="arima")
@@ -48,7 +48,7 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
         for (i in 1:n.s)
         {
             if(fmethod=="ets")
-                p.f.mat[,i] <- exp(forecast(log(fulldata$gma[,i]+1), h=h,...)$mean)-1
+                p.f.mat[,i] <- exp(forecast(ets(log(fulldata$gma[,i]+1)), h=h,...)$mean)-1
             else if(fmethod=="rw")
                 p.f.mat[,i] <- exp(rwf(log(fulldata$gma[,i]+1), h=h)$mean)-1
             else if(fmethod=="arima")

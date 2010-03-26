@@ -4,10 +4,12 @@ make.groups <- function(data)
 {
     # Check if already created group matrix
     if(is.element("gmatrix",class(data)))
-        return(data)
-    vars <- rownames(data)
-    nv <- length(vars)
+        return(data)    
+    nv <- nrow(data)
     g <- matrix(1,nrow=nv+1,ncol=ncol(data))
+    vars <- rownames(data)
+    if (length(vars) == 0)
+        vars = 1:nrow(g)      
     fac <- ""
     for(i in 1:nv)
     {

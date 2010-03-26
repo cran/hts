@@ -17,9 +17,9 @@ forecast.hts(object, h, fmethod = c("ets", "rw", "arima"), method = c("comb", "b
   \item{method}{Method for distributing forecasts within the hierarchy. See details}
   \item{level}{Level used for "middle-out" method (only used when \code{method="mo"})}
   \item{positive}{If TRUE, forecasts are forced to be strictly positive}
-  \item{xreg}{Optionally, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
-  \item{newxreg}{Optionally, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
-  \item{...}{Other arguments passing to \code{\link[forecast]{auto.arima}}}
+  \item{xreg}{When \code{fmethod = "arima"}, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
+  \item{newxreg}{When \code{fmethod = "arima"}, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
+  \item{...}{Other arguments passing to \code{\link[forecast]{ets}} or \code{\link[forecast]{auto.arima}}}
 }
 \value{A hierarchical time series of class \code{\link[hts]{hts}}.}
 \details{
@@ -44,7 +44,7 @@ Gross, C. and Sohl, J. (1990) Dissagregation methods to expedite product line fo
  \code{\link[hts]{hts}}, \code{\link[hts]{plot.hts}}, \code{\link[hts]{accuracy.hts}}
 }
 \examples{
-forecast(simulatedata1, h = 10, method = "bu")
+forecast(htseg1, h = 10, method = "bu")
 }
 \keyword{ts}
 
