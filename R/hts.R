@@ -13,12 +13,8 @@ hts <- function(y, g)
     else
         g <- make.groups(g)
     g <- as.matrix(g)
-    m <- apply(g, 1, function(x){
-               length(unique(x))}
-               )
-    gma <- ts(as.matrix(rowSums(y)), start = tsp.y[1], frequency = tsp.y[3])
-    y <- ts(y, start = tsp.y[1], frequency = tsp.y[3])
-    colnames(g) <- colnames(y)
-    rownames(g) <- paste("Level", 0:(nrow(g) - 1))
-    return(structure(list(y = y, g = g, m = m, gma = gma), class = "hts"))
+    levels <- nrow(g)
+    m <- apply(g,1,function(x){length(unique(x))})
+    gma <- ts(as.matrix(rowSums(y)),start=start(y),f=frequency(y))
+    return(structure(list(y=y,g=g,levels=levels,m=m,gma=gma),class="hts"))
 }
