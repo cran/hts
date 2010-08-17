@@ -2,7 +2,8 @@ export(
 forecast.hts,
 plot.hts,
 accuracy.hts,
-hts
+hts,
+allts
 )
 
 S3method(forecast,hts)

@@ -9,7 +9,13 @@ make.groups <- function(data)
     g <- matrix(1,nrow=nv+1,ncol=ncol(data))
     vars <- rownames(data)
     if (length(vars) == 0)
-        vars = 1:nrow(g)      
+        vars = 1:nrow(g)
+	else
+	{
+		j <- vars==""
+		if(sum(j)>0)
+			rownames(data)[j] <- vars[j] <- (1:nrow(g))[j]
+	}
     fac <- ""
     for(i in 1:nv)
     {

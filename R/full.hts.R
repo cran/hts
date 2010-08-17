@@ -1,4 +1,5 @@
-full.hts <- function(obj)
+# Compute series at all levels.
+allts <- function(obj)
 {
     tsp.y <- tsp(obj$y)
     if(is.null(tsp.y))
@@ -13,5 +14,5 @@ full.hts <- function(obj)
     #to pass following two line of the function as comment
     g.names <- hier.names(list(y=obj$y,g=obj$g))
     dimnames(gma)[[2]] <- g.names
-    return(structure(list(y=obj$y,g=obj$g,m=obj$m, gma=gma),class="hts"))
+    return(gma)
 }

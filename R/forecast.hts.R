@@ -24,18 +24,18 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
     # Create a matrix of point forecast (p.f.mat) for each series of the hierarchy.
     n.s <- sum(object$m)         # Total number of series in the hierarchy
     p.f.mat <- matrix(NA,h,n.s)   # Point forecast matrix
-    fulldata <- full.hts(object)
+    fulldata <- allts(object)
     
     if(!positive)
     {
         for (i in 1:n.s)
         {
             if(fmethod=="ets")
-                p.f.mat[,i] <- forecast(ets(fulldata$gma[,i]), h=h, additive.only=TRUE,...)$mean
+                p.f.mat[,i] <- forecast(ets(fulldata[,i]), h=h, additive.only=TRUE,...)$mean
             else if(fmethod=="rw")
-                p.f.mat[,i] <- rwf(fulldata$gma[,i],h=h)
+                p.f.mat[,i] <- rwf(fulldata[,i],h=h)
             else if(fmethod=="arima")
-                p.f.mat[,i] <- forecast(auto.arima(fulldata$gma[,i],xreg=xreg,...),h=h,xreg=newxreg)$mean
+                p.f.mat[,i] <- forecast(auto.arima(fulldata[,i],xreg=xreg,...),h=h,xreg=newxreg)$mean
             else
                 stop(paste(fmethod,"method not yet implemented"))
         }
@@ -43,16 +43,16 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
     }
     else # Force forecasts to be positive
     {
-        if(min(fulldata$gma,na.rm=TRUE) < 0)
+        if(min(fulldata,na.rm=TRUE) < 0)
             stop("Some data negative")
         for (i in 1:n.s)
         {
             if(fmethod=="ets")
-                p.f.mat[,i] <- exp(forecast(ets(log(fulldata$gma[,i]+1)), h=h,...)$mean)-1
+                p.f.mat[,i] <- exp(forecast(ets(log(fulldata[,i]+1)), h=h,...)$mean)-1
             else if(fmethod=="rw")
-                p.f.mat[,i] <- exp(rwf(log(fulldata$gma[,i]+1), h=h)$mean)-1
+                p.f.mat[,i] <- exp(rwf(log(fulldata[,i]+1), h=h)$mean)-1
             else if(fmethod=="arima")
-                p.f.mat[,i] <- exp(forecast(auto.arima(log(fulldata$gma[,i]+1),xreg=xreg,...),h=h,xreg=newxreg)$mean)-1
+                p.f.mat[,i] <- exp(forecast(auto.arima(log(fulldata[,i]+1),xreg=xreg,...),h=h,xreg=newxreg)$mean)-1
             else
                 stop(paste(fmethod,"method not yet implemented"))
         }

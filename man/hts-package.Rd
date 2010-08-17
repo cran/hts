@@ -16,10 +16,10 @@ Maintainer: Han Lin Shang <HanLin.Shang@buseco.monash.edu.au>
 \references{
 G. Athanasopoulos, R. A. Ahmed and R. J. Hyndman (2009) Hierarchical forecasts for Australian domestic tourism, \emph{International Journal of Forecasting}, \bold{25}, 146-166.
 
-R. J. Hyndman, R. A. Ahmed and G. Athanasopoulos (2007) Optimal combination forecasts for hierarchical time series. Working paper.
-Monash University Business and Economic Forecasting Unit.
+R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2010) 
+Optimal combination forecasts for hierarchical time series. 
+Working paper, Monash University. 
 \url{http://robjhyndman.com/papers/hierarchical}
-
 }
 \keyword{package}
 

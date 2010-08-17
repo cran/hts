@@ -21,7 +21,8 @@ td.rFP <- function(data,h,p.f.mat,c.sum,scoef.l,index)
         }
     }
     # The top-down matrix according to the proportion calculated by Gross and Sohl's approach
-    tdm.l <- ts(tdm.l[[length(data$m)]],start=end(data$y)[1]+1,f=frequency(data$y))
+    tdm.l <- ts(tdm.l[[length(data$m)]],start=tsp(data$y)[2]+1/frequency(data$y),
+		f=frequency(data$y))
     tdm.l[is.na(tdm.l)] <- 0
     colnames(tdm.l) <- colnames(data$y)
     return(hts(y=tdm.l,g=data$g))

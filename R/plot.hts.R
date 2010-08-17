@@ -20,7 +20,7 @@ plot.hts <- function(x,levels=length(x$m),labels=TRUE,...)
         return(invisible())
     }
 
-    gma <- full.hts(x)$gma
+    gma <- allts(x)
 
     cm <- c(0,cumsum(x$m))
     par(mfrow=c(levels,1))

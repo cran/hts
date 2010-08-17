@@ -7,7 +7,7 @@ accuracy.hts <- function(f, x)
     xx <- window(x$y, start = tsp(f$y)[1], end = tsp(f$y)[2])
     for(i in 1:ns)
     {
-        ff <- list(mean = f$y[,i], x = window(x$y[,i], start = tsp(f$y)[1], end = tsp(f$y)[2], frequency = 1/tsp(f$y)[3]))
+        ff <- list(mean = f$y[,i], x = x$y[,i])
         out[,i] <- accuracy(ff, xx[,i])
     }
     colnames(out) <- colnames(f$y)

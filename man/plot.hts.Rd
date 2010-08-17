@@ -18,9 +18,9 @@ plot.hts(x, levels = length(x$m), labels = TRUE, ...)
 \author{Rob J Hyndman}
 
 \references{
-Hyndman, Rob J., Ahmed, Roman A., and Athanasopoulos, G. (2007) 
-Optimal combination forecasts for hierarchical time series. Working paper. 
-Monash University Business and Economic Forecasting Unit.
+R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2010) 
+Optimal combination forecasts for hierarchical time series. 
+Working paper, Monash University. 
 \url{http://robjhyndman.com/papers/hierarchical}
 }
 \examples{
