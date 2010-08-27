@@ -1,6 +1,10 @@
+v 1.4
+
+1) update forecast.hts() when method = "rw"
+
 v 1.3
 
-1) Bug fixes, especially with respect to time series characteristics, in all td.xxx() functions and bup.f().
+1) Bug fixes, especially with respect to time series characteristics, in all td.() functions and bup.f().
 2) Bug fixes to how names are handled in hier.names()
 3) Bug fixes in make.groups()
 4) Bug fix in accuracy.hts()
@@ -8,8 +12,8 @@ v 1.3
 6) Because of changes in what allts() returns, the old calls to full.hts() needed to be corrected everywhere.
 7) Updated all references to the working paper.
 
-
 v 1.2
 
 1) Update the hts function
 2) Update the hts:::bup.f function
+

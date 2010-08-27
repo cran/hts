@@ -2,18 +2,18 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
     method=c("comb","bu", "mo", "tdgsf", "tdgsa", "tdfp","all"), 
     level, positive=FALSE, xreg = NULL, newxreg = NULL, ...) 
 { 
-
     require(forecast)
+    method <- match.arg(method)
+    fmethod <- match.arg(fmethod)
+
+    # Check arguments
+
     if(method=="mo" & missing(level))
         stop("Please specify level for middle-out method")
-    
-    # Check arguments
     if(class(object) != "hts")
         stop("Data not hierarchical time series")
     if(h <= 0)
         stop("Forecast horizon must be positive")
-    method <- match.arg(method)
-    fmethod <- match.arg(fmethod)
     levels <- length(object$m)
     if(levels == 1)
         method <- "comb"
@@ -33,7 +33,7 @@ forecast.hts <- function (object, h, fmethod=c("ets","rw","arima"),
             if(fmethod=="ets")
                 p.f.mat[,i] <- forecast(ets(fulldata[,i]), h=h, additive.only=TRUE,...)$mean
             else if(fmethod=="rw")
-                p.f.mat[,i] <- rwf(fulldata[,i],h=h)
+                p.f.mat[,i] <- rwf(fulldata[,i],h=h)$mean
             else if(fmethod=="arima")
                 p.f.mat[,i] <- forecast(auto.arima(fulldata[,i],xreg=xreg,...),h=h,xreg=newxreg)$mean
             else
