@@ -1,23 +1,35 @@
 middleout <- function(data, h, level, positive=FALSE,fmethod,...)
 {
-    # Simple special cases at top and bottom levels
-    if(level==length(data$m))
-        return(forecast.hts(data,h=h,positive=positive,method="bu",fmethod=fmethod,...))
-    else if(level==1)
-        return(forecast.hts(data,h=h,positive=positive,method="tdfp",fmethod=fmethod,...))
-    
-    # Proceed if genuinely at middle level
-    ntrees <- data$m[level]
-    fcast <- NULL
-    for(i in 1:ntrees)
-    {
-        j <- data$g[level,]==i
-        x <- hts(data$y[,j],fix.groups(data$g[level:nrow(data$g),j]))
-        fcast <- cbind(fcast,forecast.hts(x,h=h,positive=positive,method="tdfp",fmethod=fmethod,...)$y)
-    }
-    
-    # Construct result
-    fcast <- ts(fcast,f=frequency(data$y),start=tsp(data$y)[2]+1/frequency(data$y))
-    colnames(fcast) <- colnames(data$y)
-    return(hts(fcast,data$g))
+  # Simple special cases at top and bottom levels
+  if(level==length(data$m))
+    return(forecast.hts(data,h=h,positive=positive,method="bu",fmethod=fmethod,...))
+  else if(level==1)
+    return(forecast.hts(data,h=h,positive=positive,method="tdfp",fmethod=fmethod,...))
+  
+  # Proceed if genuinely at middle level
+  ntrees <- data$m[level]
+  fcast <- NULL
+  for(i in 1:ntrees)
+  {
+    j <- data$g[level,]==i
+    x <- hts(data$y[,j],fix.groups(data$g[level:nrow(data$g),j]))
+    fcast <- cbind(fcast,forecast.hts(x,h=h,positive=positive,method="tdfp",fmethod=fmethod,...)$y)
+  }
+  
+  # Construct result
+  fcast <- ts(fcast,f=frequency(data$y),start=tsp(data$y)[2]+1/frequency(data$y))
+  colnames(fcast) <- colnames(data$y)
+  return(hts(fcast,data$g))
+}
+
+
+
+# Fix group matrix so it has the lowest possible integers
+fix.groups <- function(g)
+{
+  if(class(g)=="numeric")
+    g <- matrix(g,ncol=1)
+  for(i in 1:nrow(g))
+    g[i,] <- as.numeric(as.factor(g[i,]))
+  return(g)
 }

@@ -1,12 +1,12 @@
-\name{plot.hts}
+\name{plot.gts}
 \Rdversion{1.1}
-\alias{plot.hts}
-\title{Plot a hierarchical time series}
+\alias{plot.gts}
+\title{Plot grouped or hierarchical time series}
 \description{
-Method for plotting hierarchical time series. 
+Method for plotting grouped or hierarchical time series. 
 }
 \usage{
-plot.hts(x, levels = length(x$m), labels = TRUE, ...)
+\S3method{plot}{gts}(x, levels = length(x$m), labels = TRUE, ...)
 }
 
 \arguments{
@@ -18,10 +18,10 @@ plot.hts(x, levels = length(x$m), labels = TRUE, ...)
 \author{Rob J Hyndman}
 
 \references{
-R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2010) 
+R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2011) 
 Optimal combination forecasts for hierarchical time series. 
-Working paper, Monash University. 
-\url{http://robjhyndman.com/papers/hierarchical}
+\emph{Computational Statistics and Data Analysis}, \bold{55}(9), 2579--2589.
+\url{http://robjhyndman.com/papers/hierarchical/}
 }
 \examples{
 plot(htseg1)

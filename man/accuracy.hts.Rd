@@ -1,15 +1,15 @@
-\name{accuracy.hts}
+\name{accuracy.gts}
 \Rdversion{1.1}
-\alias{accuracy.hts}
+\alias{accuracy.gts}
 \title{
-Accuracy measures for forecast hierarchical model
+Accuracy measures for forecast grouped and hierarchical model
 }
 \description{
 Returns range of summary measures of the forecast accuracy. The function measures 
 out-of-sample forecast accuracy based on (holdout data - forecasts). All measures are defined and discussed in Hyndman and Koehler (2006). 
 }
 \usage{
-accuracy.hts(f, x)
+accuracy.gts(f, x)
 }
 \arguments{
   \item{f}{An object of class \code{\link[hts]{hts}}, containing the forecasted hierarchical time series}
@@ -27,7 +27,7 @@ Vector giving forecast accuracy measures.
 \item{Theil's U}{Theil's U Inequality Index}
 }
 \references{
-R. Hyndman and A. Koehler (2006), Another look at measures of forecast accuracy, \emph{International Journal of Forecasting}, \bold{22}, 679-688.
+R. J. Hyndman and A. Koehler (2006), Another look at measures of forecast accuracy, \emph{International Journal of Forecasting}, \bold{22}, 679-688.
 }
 \author{
 Rob J Hyndman

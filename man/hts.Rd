@@ -1,40 +1,44 @@
 \name{hts}
 \Rdversion{1.1}
 \alias{hts}
-\title{Create a hierarchical time series}
+\alias{gts}
+\title{Create a hierarchical or grouped time series}
 \description{
-Method for creating hierarchical time series. 
+Method for creating hierarchical or grouped time series.  For a grouped 
+time series, there is no need for a hierarchical structure.
+
 }
 \usage{
 hts(y, g)
+gts(y, g)
 }
 \arguments{
   \item{y}{Multivariate time series containing the bottom level series}
-  \item{g}{Group matrix indicating the hierarchical structure, 
-           with one column for each bottom level series, 
-           and one row for each level of the hierarchy}
+  \item{g}{Group matrix indicating the group structure, with one column for each series when completely disaggregated,
+           and one row for each grouping of the time series.}
 }
 \value{
   \item{y}{Multivariate time series containing the bottom level series}
-  \item{g}{Information about the levels and groups of a hierarchical time series}
-  \item{m}{Number of time series within each level}
+  \item{g}{Information about the groups of a grouped time series}
+  \item{m}{Number of groups within each grouping}
   \item{gma}{Top level series equal to the rowsums of \code{y}}
 }
 \references{
-R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2010) 
+R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2011) 
 Optimal combination forecasts for hierarchical time series. 
-Working paper, Monash University. 
-\url{http://robjhyndman.com/papers/hierarchical}
+\emph{Computational Statistics and Data Analysis}, \bold{55}(9), 2579--2589.
+\url{http://robjhyndman.com/papers/hierarchical/}
 }
 \author{Rob J Hyndman}
 
 \seealso{
-\code{\link[hts]{accuracy.hts}}, \code{\link[hts]{forecast.hts}}, \code{\link[hts]{plot.hts}}
+\code{\link[hts]{accuracy.gts}}, \code{\link[hts]{forecast.hts}}, \code{\link[hts]{forecast.gts}}, \code{\link[hts]{plot.gts}}
 }
+
 \examples{
 abc <- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 100))
-g.abc <- rbind(c(1, 1, 2, 2), 1:4)
-x <- hts(y = abc, g = g.abc) 
+x <- hts(abc, c(1,1,2,2))
+y <- gts(abc, rbind(c(1,1,2,2), c(1,2,1,2)))
 }
 
 \keyword{ts}

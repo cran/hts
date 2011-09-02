@@ -1,14 +1,20 @@
 export(
+forecast.gts,
 forecast.hts,
-plot.hts,
-accuracy.hts,
+plot.gts,
+accuracy.gts,
 hts,
-allts
+gts,
+allts,
+combinef,
+Smatrix
 )
 
+S3method(forecast,gts)
 S3method(forecast,hts)
-S3method(plot,hts)
-S3method(accuracy,hts)
+S3method(plot,gts)
+S3method(accuracy,gts)
+S3method(print,gts)
 S3method(print,hts)
 
 import(forecast)

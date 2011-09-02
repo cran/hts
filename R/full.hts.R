@@ -8,11 +8,52 @@ allts <- function(obj)
         stop("Not time series data")
     }
     # Compute series at all levels
-    S <- Scsr(hts(y=obj$y,g=obj$g))
+    S <- Scsr(obj)
     gma <- ts(as.matrix(as.matrix.csr(obj$y) %*% t(S)),start=tsp.y[1],frequency=tsp.y[3])
-    # hier.names function can generate 26 letters for naming. If number of split is greater than 26 we have
-    #to pass following two line of the function as comment
-    g.names <- hier.names(list(y=obj$y,g=obj$g))
-    dimnames(gma)[[2]] <- g.names
+    dimnames(gma)[[2]] <- group.names(obj)
     return(gma)
+}
+
+# Function to generate group names for all levels
+
+group.names <- function(x)
+{
+  if(is.hts(x))
+    return(hier.names(x))
+  nl <- nrow(x$g)
+  ns <- ncol(x$g)
+  gnames <- c("Total")
+  if(nl==1)
+    return(g)
+  LETNUM <- c(LETTERS,1:1e+05)
+  for(i in 2:nl)
+    gnames <- c(gnames, paste(LETNUM[i-1],seq(1,x$m[i],by=1), sep=""))
+    return(gnames)
+}
+
+# Function to generate group names for all levels for hts
+hier.names <- function (x) 
+{
+  nl <- nrow(x$g)
+  ns <- ncol(x$g)
+  if (nl == 1) 
+    return("Total")
+  LETNUM <- c(LETTERS, 1:1e+05)
+  names <- rep("A", ns)
+  for (i in 2:nl) 
+  {
+    groups <- unique(x$g[i - 1, ])
+    current.names <- numeric(length(names))
+    for (j in c(groups)) 
+    {
+      k <- (x$g[i - 1, ] == j)
+      tmp <- x$g[i, k]
+      current.names[k] <- LETNUM[tmp - min(tmp) + 1]
+    }
+    names <- paste(names, current.names, sep = "")
+  }
+  g.names <- "Total"
+  for (i in 2:nl) 
+    g.names <- c(g.names, unique(substr(names, 2, i)))
+  return(g.names)
 }
