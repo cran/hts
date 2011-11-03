@@ -24,7 +24,7 @@ group.names <- function(x)
   ns <- ncol(x$g)
   gnames <- c("Total")
   if(nl==1)
-    return(g)
+    return("Total")
   LETNUM <- c(LETTERS,1:1e+05)
   for(i in 2:nl)
     gnames <- c(gnames, paste(LETNUM[i-1],seq(1,x$m[i],by=1), sep=""))
@@ -39,7 +39,7 @@ hier.names <- function (x)
   if (nl == 1) 
     return("Total")
   LETNUM <- c(LETTERS, 1:1e+05)
-  names <- rep("A", ns)
+  names <- rep("/", ns)
   for (i in 2:nl) 
   {
     groups <- unique(x$g[i - 1, ])
@@ -50,10 +50,14 @@ hier.names <- function (x)
       tmp <- x$g[i, k]
       current.names[k] <- LETNUM[tmp - min(tmp) + 1]
     }
-    names <- paste(names, current.names, sep = "")
+    names <- paste(names, current.names, "/", sep = "")
   }
+  splits <- matrix(unlist(gregexpr("/",names)),nrow=ns,byrow=TRUE)
   g.names <- "Total"
   for (i in 2:nl) 
-    g.names <- c(g.names, unique(substr(names, 2, i)))
+  {
+    lnames <- substr(names,2,splits[,i]-1)
+    g.names <- c(g.names, unique(lnames))
+  }
   return(g.names)
 }

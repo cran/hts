@@ -1,3 +1,6 @@
+v2.01 (3 November 2011)
+* Changed hierarchical naming convention to allow much bigger hierarchies.
+
 v2.0 (2 September 2011)
 
 * Added grouped time series (gts) objects, and re-wrote many functions in order to handle them.
