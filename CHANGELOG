@@ -1,3 +1,6 @@
+v2.02 (3 November 2011)
+* Bug fixes to cope with much bigger hierarchies
+
 v2.01 (3 November 2011)
 * Changed hierarchical naming convention to allow much bigger hierarchies.
 

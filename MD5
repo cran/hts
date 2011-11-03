@@ -1,5 +1,5 @@
-7494b958d5a1430268e5b6453d822957 *ChangeLog
-7200d957d8de47dca25eb2698c161283 *DESCRIPTION
+a83b7366dcae2d877e5a17160d5f6dd1 *ChangeLog
+15c0f170f71b67133989e44bf944307e *DESCRIPTION
 35f441c4e6d2bc215660f44c07af1a4a *NAMESPACE
 faf6aa189de4a034010f643a43ce72ec *R/bottomup.R
 ead237ba7e31a15a843caa768f4698f0 *R/combine.R
@@ -7,7 +7,7 @@ b8be6d505850d09b400e279799c6149f *R/forecast.hts.R
 567980e3a40156a68a3ef3083dd61dd5 *R/full.hts.R
 9cee5211afc699a6c58c38c764927a99 *R/hts.R
 6ca888366af50a2468e881c19ea98f5f *R/middleout.R
-be3c0fc091b0281275098a1db4f713a9 *R/plot.hts.R
+d29785aed23dc36a57835f24bc2dabfa *R/plot.hts.R
 a1b818055e5c0e0a58ade084ebfbac9a *R/summingmatrix.R
 f73ae3ce0820cd681ed443ae131acc54 *R/topdown.R
 cdd405be733f5a8ae759917db97daae0 *data/htseg1.rda

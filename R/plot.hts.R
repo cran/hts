@@ -28,7 +28,7 @@ plot.gts <- function(x,levels=length(x$m),labels=TRUE,...)
   for(i in 1:levels)
   {
     if(x$m[i]>1)
-      palette(rainbow(x$m[i]))
+      palette(rainbow(min(1024,x$m[i])))
     if(fcasts)
       addon <- matrix(NA,nrow=nrow(x$hfcast),ncol=x$m[i])
     else
