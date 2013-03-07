@@ -11,7 +11,6 @@ Smatrix <- function(object)
 
 Scsr <- function(x)
 {
-  require(SparseM)
   ns <- ncol(x$y)  # number of series
   nl <- nrow(x$g)  # number of levels
   l <- sum(x$m)    # total number of series

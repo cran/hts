@@ -1,3 +1,10 @@
+v3.00 (7 March 2013)
+* Restructured gts objects and dropped hts objects. A flag indicates if gts is hierarchical.
+* gts objects can now contain forecasts as well as historical data.
+* Updated plot.gts function with an option to show historical data as well as forecasts
+* Added the window.gts function
+* Moved SparseM from Depends to Imports
+
 v2.02 (3 November 2011)
 * Bug fixes to cope with much bigger hierarchies
 

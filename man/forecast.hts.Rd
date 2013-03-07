@@ -1,17 +1,15 @@
 \name{forecast.hts}
 \Rdversion{1.1}
-\alias{forecast.hts}
 \alias{forecast.gts}
 \title{Forecast a hierarchical or grouped time series}
 \description{
 Methods for forecasting hierarchical or grouped time series. 
 }
 \usage{
-\S3method{forecast}{hts}(object, h, 
+\S3method{forecast}{gts}(object, h, 
   method = c("comb", "bu", "mo", "tdgsf", "tdgsa", "tdfp", "all"), 
   fmethod = c("ets", "rw", "arima"), level, positive = FALSE, 
 	xreg = NULL, newxreg = NULL, ...)
-\S3method{forecast}{gts}(object, h, method = c("comb", "bu"), ...)
 }
 \arguments{
   \item{object}{Hierarchical time series object of class \code{\link[hts]{hts}}}
@@ -24,7 +22,7 @@ Methods for forecasting hierarchical or grouped time series.
   \item{newxreg}{When \code{fmethod = "arima"}, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
   \item{...}{Other arguments passing to \code{\link[forecast]{ets}} or \code{\link[forecast]{auto.arima}}}
 }
-\value{A hierarchical time series of class \code{\link[hts]{hts}} or a grouped time series of class \code{\link{gts}}, matching the class of \code{object}.}
+\value{A forecasted hierarchical/grouped time series of class \code{gts}.}
 \details{
 Base methods implemented include ETS, ARIMA and the naive (random walk) models.
 Forecasts are distributed in the hierarchy using bottom-up, top-down, middle-out and 

@@ -3,7 +3,7 @@
 \alias{Smatrix}
 \title{Summing matrix for hierarchical time series}
 \description{
-This function returns the summing matrix for a hierarchical time series, as defined in Hyndman et al. (2011).
+This function returns the summing matrix for a hierarchical or grouped time series, as defined in Hyndman et al. (2011).
 }
 \usage{
 Smatrix(object)

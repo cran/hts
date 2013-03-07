@@ -1,24 +1,24 @@
 # Compute series at all levels.
-allts <- function(obj)
+# uses obj$y if forecast=TRUE and obj$oldy otherwise.
+
+allts <- function(obj, forecasts=TRUE)
 {
-    tsp.y <- tsp(obj$y)
-    if(is.null(tsp.y))
-    {
-        browser()
-        stop("Not time series data")
-    }
-    # Compute series at all levels
-    S <- Scsr(obj)
-    gma <- ts(as.matrix(as.matrix.csr(obj$y) %*% t(S)),start=tsp.y[1],frequency=tsp.y[3])
-    dimnames(gma)[[2]] <- group.names(obj)
-    return(gma)
+  if(!forecasts)
+    obj$y <- obj$oldy
+  tsp.y <- tsp(obj$y)
+  if(is.null(tsp.y))
+    stop("Not time series data")
+  S <- Scsr(obj)
+  gma <- ts(as.matrix(as.matrix.csr(obj$y) %*% t(S)),start=tsp.y[1],frequency=tsp.y[3])
+  dimnames(gma)[[2]] <- group.names(obj)
+  return(gma)
 }
 
 # Function to generate group names for all levels
 
 group.names <- function(x)
 {
-  if(is.hts(x))
+  if(x$hierarchical)
     return(hier.names(x))
   nl <- nrow(x$g)
   ns <- ncol(x$g)

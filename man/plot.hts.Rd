@@ -3,15 +3,17 @@
 \alias{plot.gts}
 \title{Plot grouped or hierarchical time series}
 \description{
-Method for plotting grouped or hierarchical time series. 
+Method for plotting grouped or hierarchical time series and their forecasts.
 }
 \usage{
-\S3method{plot}{gts}(x, levels = length(x$m), labels = TRUE, ...)
+\S3method{plot}{gts}(x, include, levels = length(x$m), labels = TRUE, ...)
 }
 
 \arguments{
-  \item{x}{An object of class \code{\link[hts]{hts}}}
-  \item{levels}{Number of levels of the hierarchy + to be plotted}
+  \item{x}{An object of class \code{\link[hts]{gts}}.}
+  \item{include}{Number of values from historical time series to include in the plot of forecasted group/hierarchical time series.}  
+  \item{levels}{Number of levels of the hierarchy to be plotted}
+  
   \item{labels}{If \code{TRUE}, plot the labels next to each series}
   \item{\dots}{Other arguments passing to \code{\link[graphics]{plot.default}}}
 }
