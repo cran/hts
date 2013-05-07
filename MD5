@@ -1,7 +1,7 @@
-64a62d2ed31e2a56260de379cac448aa *ChangeLog
-3075b5f2b351565afd1afc5492278684 *DESCRIPTION
+207c5233fd1d8a1bafe90ce75dcd9746 *ChangeLog
+281d615a1e79b69f9455a371dd410386 *DESCRIPTION
 314d52e12847c0926afb314b841af383 *NAMESPACE
-46fdf2bf54207dbef07eef4d46b7e3af *R/bottomup.R
+524ba5693406464b01e777ce22378c1c *R/bottomup.R
 ccc3d85d70473d76e76de1aba1dda896 *R/combine.R
 9624be1acf6e3ed0fc96964d59f02571 *R/forecast.hts.R
 6c0b8b651234a6d690e5819a7f9c9164 *R/full.hts.R
@@ -10,9 +10,15 @@ d5b3cf60e6bb7916ea207b376512a37d *R/middleout.R
 dd679e0d10b771ce13193c803c3619f5 *R/plot.hts.R
 721c81e6175a789b7711290b56d2e061 *R/summingmatrix.R
 9b94ae0710ffc8359e981e25ee1ec4a7 *R/topdown.R
-7416f58aeb6d10709ee49df9606ddf8b *README.md
 8e83bd49820a757ca7dc91068785c57e *data/htseg1.rda
 fd28114237ab4689be7a2cbbbabc50d5 *data/htseg2.rda
+35d645288f6ebbc21f79ae5ab870f589 *data/infantgts.rda
+ad71a7174a12cdefbc3a35fac7db7b2e *inst/doc/forecasthts.pdf
+74a96b7ce5ae905ca3f99fdae8187f84 *inst/doc/hts.R
+492c3e94089be95e4de1c34e05d68204 *inst/doc/hts.Rnw
+3ecf5932a65113996ebdc190867a2eb4 *inst/doc/hts.bib
+dc89ea96f2f19b557d878f3356e76045 *inst/doc/hts.pdf
+01f3e060911cb1e460984a7906d61e9a *inst/doc/hts_plot.pdf
 caf8bd34bd448ddb12679eb279820e06 *man/Smatrix.Rd
 304776cec6cdc581ef963ec286217d0a *man/accuracy.hts.Rd
 c8cf7f259c65274879f0c0c7023cc65c *man/allts.Rd
@@ -21,5 +27,6 @@ a27ac8a162c7a623a18675a24ab42e23 *man/combinef.Rd
 93bcdd0330647d010911bc0704be6df7 *man/hts-package.Rd
 89e011c4c4c31ad710ee9670b6a775f6 *man/hts.Rd
 4295a3cba4edffecc3da3eb344f1589e *man/htseg2.Rd
+1bfedf39350146483f2d4fb948e251e2 *man/infantgts.Rd
 26d24d80698a36d37de8616212db3394 *man/plot.hts.Rd
 2319f21d05c07715ed791eee3d36f732 *man/window.gts.Rd
