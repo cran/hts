@@ -3,16 +3,16 @@
 \alias{forecast.gts}
 \title{Forecast a hierarchical or grouped time series}
 \description{
-Methods for forecasting hierarchical or grouped time series. 
+Methods for forecasting hierarchical or grouped time series.
 }
 \usage{
-\S3method{forecast}{gts}(object, h, 
-  method = c("comb", "bu", "mo", "tdgsf", "tdgsa", "tdfp", "all"), 
-  fmethod = c("ets", "rw", "arima"), level, positive = FALSE, 
+\S3method{forecast}{gts}(object, h,
+  method = c("comb", "bu", "mo", "tdgsf", "tdgsa", "tdfp", "all"),
+  fmethod = c("ets", "rw", "arima"), level, positive = FALSE,
 	xreg = NULL, newxreg = NULL, ...)
 }
 \arguments{
-  \item{object}{Hierarchical time series object of class \code{\link[hts]{hts}}}
+  \item{object}{Hierarchical time series object of class \code{\link[hts]{gts}}}
   \item{h}{Forecast horizon}
   \item{method}{Method for distributing forecasts within the hierarchy. See details}
   \item{fmethod}{Forecasting method to use}
@@ -25,22 +25,22 @@ Methods for forecasting hierarchical or grouped time series.
 \value{A forecasted hierarchical/grouped time series of class \code{gts}.}
 \details{
 Base methods implemented include ETS, ARIMA and the naive (random walk) models.
-Forecasts are distributed in the hierarchy using bottom-up, top-down, middle-out and 
-optimal combination methods. Three top-down methods are available: the two Gross-Sohl 
+Forecasts are distributed in the hierarchy using bottom-up, top-down, middle-out and
+optimal combination methods. Three top-down methods are available: the two Gross-Sohl
 methods and the forecast-proportion approach of Hyndman, Ahmed, and Athanasopoulos (2011).
 The "middle-out" method \code{"mo"} uses bottom-up (\code{"bu"}) for levels higher than \code{level}
 and top-down forecast proportions (\code{"tdfp"}) for levels lower than \code{level}. For non-hierarchical grouped data, only bottom-up and combination methods are possible, as any method involving top-down disaggregation requires a hierarchical ordering of groups.
 }
 \references{
-G. Athanasopoulos, R. A. Ahmed and R. J. Hyndman (2009) Hierarchical forecasts for Australian domestic tourism, 
+G. Athanasopoulos, R. A. Ahmed and R. J. Hyndman (2009) Hierarchical forecasts for Australian domestic tourism,
 \emph{International Journal of Forecasting}, \bold{25}, 146-166.
 
-R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2011) 
-Optimal combination forecasts for hierarchical time series. 
+R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2011)
+Optimal combination forecasts for hierarchical time series.
 \emph{Computational Statistics and Data Analysis}, \bold{55}(9), 2579--2589.
 \url{http://robjhyndman.com/papers/hierarchical/}
 
-Gross, C. and Sohl, J. (1990) Dissagregation methods to expedite product line forecasting, 
+Gross, C. and Sohl, J. (1990) Dissagregation methods to expedite product line forecasting,
 \emph{Journal of Forecasting}, \bold{9}, 233-254.
 }
 

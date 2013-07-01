@@ -1,7 +1,7 @@
 ############################
 ###### Bottom-up Code ######
 ############################
-   
+       
 bup.f <- function (data, h, p.f.mat, index) 
 {
   a <- length(index)

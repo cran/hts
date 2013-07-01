@@ -1,3 +1,10 @@
+v3.03 (1 July 2013)
+* Added a warning in accuracy.gts() when data is too short to compute MASE
+* Corrected small compiling error in the vignette and moved to sub-directory vignettes.
+
+v3.02 (12 June 2013)
+* Fixed bug in using gts with forecast(method="all")
+
 v3.01 (7 May 2013)
 * Added the infantgts data
 * Added the vignette

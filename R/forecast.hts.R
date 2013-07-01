@@ -1,8 +1,8 @@
-forecast.gts <- function (object, h, 
-    method=c("comb","bu", "mo", "tdgsf", "tdgsa", "tdfp","all"), 
-    fmethod=c("ets","rw","arima"),  
-    level, positive=FALSE, xreg = NULL, newxreg = NULL, ...) 
-{ 
+forecast.gts <- function (object, h,
+    method=c("comb","bu", "mo", "tdgsf", "tdgsa", "tdfp","all"),
+    fmethod=c("ets","rw","arima"),
+    level, positive=FALSE, xreg = NULL, newxreg = NULL, ...)
+{
   require(forecast)
   method <- match.arg(method)
   fmethod <- match.arg(fmethod)
@@ -20,7 +20,7 @@ forecast.gts <- function (object, h,
   levels <- length(object$m)
   if(levels == 1)
     method <- "comb"
-              
+
   if(method == "mo")
     return(middleout(data=object,h=h,level=level,positive=positive,fmethod=fmethod,...))
 
@@ -29,7 +29,7 @@ forecast.gts <- function (object, h,
   tspx <- tsp(object$y)
   p.f.mat <- ts(matrix(NA,h,n.s),frequency=tspx[3],start=tspx[2]+1/tspx[3])   # Point forecast matrix
   fulldata <- allts(object)
-  
+
   if(!positive)
   {
     for (i in 1:n.s)
@@ -43,7 +43,7 @@ forecast.gts <- function (object, h,
       else
         stop(paste(fmethod,"method not yet implemented"))
     }
-          
+
   }
   else # Force forecasts to be positive
   {
@@ -60,7 +60,7 @@ forecast.gts <- function (object, h,
       else
           stop(paste(fmethod,"method not yet implemented"))
     }
-  }      
+  }
 
   # Set up information for top down forecasts
   if(substr(method,1,2) == "td" | method == "all")
@@ -73,15 +73,18 @@ forecast.gts <- function (object, h,
       scoef.l[[i]] <- matrix(NA,length(unique(object$g[i+1,])),length(unique(object$g[i+1,])))
       for (j in 1:(length(c.sum[[i]])-1))
       {
-        scoef.l[[i]][,(c.sum[[i]][j]+1):(c.sum[[i]][j+1])] <- c(rep(0,c.sum[[i]][j]),
+        if(c.sum[[i]][j] < nrow(scoef.l[[i]]))
+        {
+          scoef.l[[i]][,(c.sum[[i]][j]+1):(c.sum[[i]][j+1])] <- c(rep(0,c.sum[[i]][j]),
                   rep(1,c.sum[[i]][j+1]-c.sum[[i]][j]),
                   rep(0,object$m[[i+1]]-c.sum[[i]][j+1]))
+        }
       }
-    }   
+    }
   }
-      
+
   index <- cumsum(object$m)
-  
+
   if(method == "tdgsf")
     return(td.gsF(object,h,p.f.mat,c.sum,scoef.l))  # Return forecast by Gross and Sohl's Approach "F"
   else if(method == "tdgsa")
@@ -102,7 +105,7 @@ forecast.gts <- function (object, h,
 }
 
 accuracy.gts <- function(f, x, criterion=c("all", "RMSE", "MAE", "MAPE", "MASE"))
-{	
+{
  	if(!is.gts(f) | !is.gts(x))
     stop("f and x should be a grouped time series.")
   if(is.null(f$oldy))
@@ -114,8 +117,8 @@ accuracy.gts <- function(f, x, criterion=c("all", "RMSE", "MAE", "MAPE", "MASE")
     criterion=c("RMSE", "MAE", "MAPE", "MASE")
   }
   ns <- sum(f$m)
-  out <- matrix(NA, nrow = length(criterion), ncol = ns)  
-  
+  out <- matrix(NA, nrow = length(criterion), ncol = ns)
+
   allx <- allts(x)
   allf <- allts(f)
   res <- allx - allf
@@ -126,8 +129,13 @@ accuracy.gts <- function(f, x, criterion=c("all", "RMSE", "MAE", "MAPE", "MASE")
     m <- frequency(f$y)
     if(m <= 1)
       scale <- colMeans(diff(allx))
-    else
+    else if(nrow(allx) > m)
       scale <- colMeans(diff(allx,lag=m))
+    else
+    {
+      warning("Insufficient historical data to compute MASE")
+      scale <- NA
+    }
     q <- sweep(res,2,scale,"/")
   }
 
