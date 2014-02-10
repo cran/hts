@@ -6,14 +6,16 @@ The time series from all levels of a hierarchical/grouped time series or a forec
 hierarchical/grouped time series are returned as a multivariate time series.
 }
 \usage{
-allts(obj, forecasts=TRUE)
+allts(y, forecasts=TRUE)
 }
 
 \arguments{
-  \item{obj}{An object of class \code{\link[hts]{gts}}.}
-  \item{forecasts}{If \code{obj} contains forecasts and historical data, then \code{forecasts} indicates whether to return the forecasts or the historical data. Otherwise it is ignored.}
+  \item{y}{An object of class \code{\link[hts]{gts}}.}
+  \item{forecasts}{If \code{y} contains forecasts and historical data, then \code{forecasts} indicates whether to return the forecasts or the historical data. Otherwise it is ignored.}
 }
 \author{Rob J Hyndman}
+
+\seealso{\code{\link[hts]{aggts}}}
 
 \examples{
 allts(htseg1)

@@ -1,20 +1,21 @@
 \name{combinef}
 \Rdversion{1.1}
 \alias{combinef}
-\title{Optimally combine forecasts from a hierarchical time series}
+\title{Optimally combine forecasts from a hierarchical or grouped time series}
 \description{
 Using the method of Hyndman et al. (2011), this function optimally combines the forecasts at all levels of a hierarchical time series. The \code{\link{forecast.gts}} calls this function when the \code{comb} method is selected.
 }
 \usage{
-combinef(fcasts, S, return=c("gts","matrix","bottomlevelonly"), hierarchical=FALSE)
+combinef(fcasts, nodes, groups, weights = NULL, keep = c("gts", "bottom"))
 }
 \arguments{
   \item{fcasts}{Matrix of forecasts for all levels of the hierarchical time series. Each row represents one forecast horizon and each column represents one time series from the hierarchy.}
-  \item{S}{The summing matrix defining how the forecasts at the bottom level are summed to obtain each time series in the hierarchy.}
-  \item{return}{determines what type and class of object to return.}
-  \item{hierarchical}{indicates if the grouped time series should be hierarchical. Ignored if \code{return!="gts"}.}
+  \item{nodes}{If the object class is \code{hts}, a list contains the number of child nodes referring to \code{hts}.}
+  \item{groups}{If the object class is \code{gts}, a gmatrix is required, which is the same as \code{groups} in the function \code{gts}.}
+  \item{weights}{A numeric vector. The default is \code{NULL} that means the ordinary least squares is implemented.}
+  \item{keep}{Return a \code{gts} object or the the reconciled forecasts at the bottom level.}
 }
-\value{Either an object of class \code{gts} or a matrix of forecasts. If a matrix is returned, it can be the same  size as \code{fcasts} (if \code{return=="matrix"}) or just the bottom-level forecasts (if \code{return=="bottomlevelonly"}).}
+\value{Return the reconciled \code{gts} object or forecasts at the bottom level.}
 \references{
 R. J. Hyndman, R. A. Ahmed, G. Athanasopoulos and H.L. Shang (2011) 
 Optimal combination forecasts for hierarchical time series. 
@@ -22,7 +23,7 @@ Optimal combination forecasts for hierarchical time series.
 \url{http://robjhyndman.com/papers/hierarchical/}
 }
 
-\author{Rob J Hyndman and Roman A Ahmed}
+\author{Alan Lee, Rob J Hyndman and Earo Wang}
 
 \seealso{
  \code{\link[hts]{hts}}, \code{\link[hts]{forecast.gts}}
@@ -30,15 +31,26 @@ Optimal combination forecasts for hierarchical time series.
 \keyword{ts}
 
 \examples{
-# Construct data
-abc <- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 50))
-y <- gts(abc, rbind(c(1,1,2,2), c(1,2,1,2)))
-h <- 12 
-ally <- allts(y)
-allf <- matrix(NA,nrow=h,ncol=ncol(ally))
+# hts example
+\dontrun{h <- 12 
+ally <- aggts(htseg1)
+allf <- matrix(NA, nrow = h, ncol = ncol(ally))
 for(i in 1:ncol(ally))
-	allf[,i] <- forecast(auto.arima(ally[,i]),h=h)$mean
-allf <- ts(allf, start=51)
-y.f <- combinef(allf,Smatrix(y), return="gts")
-plot(y.f)
+	allf[,i] <- forecast(auto.arima(ally[,i]), h = h, PI = FALSE)$mean
+allf <- ts(allf, start = 51)
+y.f <- combinef(allf, htseg1$nodes, weights = NULL, keep = "gts")
+plot(y.f)}
+
+# gts example
+\dontrun{abc <- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 50))
+g <- rbind(c(1,1,2,2), c(1,2,1,2))
+y <- gts(abc, groups = g)
+h <- 12
+ally <- aggts(y)
+allf <- matrix(NA,nrow = h,ncol = ncol(ally))
+for(i in 1:ncol(ally))
+  allf[,i] <- forecast(auto.arima(ally[,i]),h = h, PI = FALSE)$mean
+allf <- ts(allf, start = 51)
+y.f <- combinef(allf, groups = g, keep ="gts")
+plot(y.f)}
 }

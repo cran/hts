@@ -1,20 +1,25 @@
 export(
-forecast.gts,
-plot.gts,
-accuracy.gts,
-window.gts,
 hts,
 gts,
+print.gts,
+aggts,
 allts,
+forecast.gts,
+window.gts,
+accuracy.gts,
+plot.gts,
+summary.gts,
 combinef,
-Smatrix
+smatrix
 )
 
-S3method(forecast,gts)
-S3method(plot,gts)
-S3method(print,gts)
-S3method(window,gts)
+S3method(print, gts)
+S3method(forecast, gts)
+S3method(window, gts)
+S3method(plot, gts)
+S3method(summary, gts)
 
 import(forecast)
 import(SparseM)
+import(parallel)
 importFrom("stats", "window")

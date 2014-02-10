@@ -16,6 +16,6 @@ Extracts a subset of the time series from a grouped time series object.
 \author{Rob J Hyndman}
 
 \examples{
-window(htseg1, start = 2000, end = 2001)
+window(htseg2, start = 2000, end = 2001)
 }
 \keyword{ts}

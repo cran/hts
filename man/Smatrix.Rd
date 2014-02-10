@@ -1,15 +1,15 @@
-\name{Smatrix}
+\name{smatrix}
 \Rdversion{1.1}
-\alias{Smatrix}
-\title{Summing matrix for hierarchical time series}
+\alias{smatrix}
+\title{Summing matrix for hierarchical or grouped time series}
 \description{
 This function returns the summing matrix for a hierarchical or grouped time series, as defined in Hyndman et al. (2011).
 }
 \usage{
-Smatrix(object)
+smatrix(xts)
 }
 \arguments{
-  \item{object}{Hierarchical time series of class \code{hts}.}
+  \item{xts}{Hierarchical or grouped time series of class \code{gts}.}
 }
 \value{A numerical matrix.}
 \references{
@@ -19,14 +19,14 @@ Optimal combination forecasts for hierarchical time series.
 \url{http://robjhyndman.com/papers/hierarchical/}
 }
 
-\author{Rob J Hyndman and Roman A Ahmed}
+\author{Earo Wang}
 
 \seealso{
- \code{\link[hts]{hts}}, \code{\link[hts]{combinef}}
+ \code{\link[hts]{hts}}, \code{\link[hts]{gts}}, \code{\link[hts]{combinef}}
 }
 
 \examples{
-Smatrix(htseg1)
+smatrix(htseg1)
 }
 \keyword{ts}
 

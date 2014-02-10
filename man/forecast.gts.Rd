@@ -1,4 +1,4 @@
-\name{forecast.hts}
+\name{forecast.gts}
 \Rdversion{1.1}
 \alias{forecast.gts}
 \title{Forecast a hierarchical or grouped time series}
@@ -6,18 +6,32 @@
 Methods for forecasting hierarchical or grouped time series.
 }
 \usage{
-\S3method{forecast}{gts}(object, h,
-  method = c("comb", "bu", "mo", "tdgsf", "tdgsa", "tdfp", "all"),
-  fmethod = c("ets", "rw", "arima"), level, positive = FALSE,
-	xreg = NULL, newxreg = NULL, ...)
+\S3method{forecast}{gts}(object, h = ifelse(frequency(object) > 1L,
+                         2L * frequency(object), 10L), 
+                         method = c("comb", "bu", "mo", 
+                                    "tdgsa", "tdgsf", "tdfp"),
+                         fmethod = c("ets", "arima", "rw"), 
+                         keep.fitted = FALSE, keep.resid = FALSE,
+                         positive = FALSE, lambda = NULL, level, 
+                         weights = c("none", "sd", "nseries"),
+                         parallel = FALSE, num.cores = NULL,
+                         xreg = NULL, newxreg = NULL, ...) 
 }
 \arguments{
-  \item{object}{Hierarchical time series object of class \code{\link[hts]{gts}}}
+  \item{object}{Hierarchical or grouped time series object of class \code{{gts}}}
   \item{h}{Forecast horizon}
   \item{method}{Method for distributing forecasts within the hierarchy. See details}
   \item{fmethod}{Forecasting method to use}
-  \item{level}{Level used for "middle-out" method (only used when \code{method="mo"})}
+  \item{keep.fitted}{If TRUE, keep fitted values at the bottom level.}
+  \item{keep.resid}{If TRUE, keep residuals at the bottom level.}
   \item{positive}{If TRUE, forecasts are forced to be strictly positive}
+  \item{lambda}{Box-Cox transformation parameter}
+  \item{weights}{Weights used for "optimal combination" method. When \code{weights = "sd"},
+  it takes account of the standard deviation of forecasts;
+  when \code{weights} = "nseries", weights are equal to the inverse of row sums of the summing matrix.}
+  \item{level}{Level used for "middle-out" method (only used when \code{method="mo"})}
+  \item{parallel}{If TRUE, import \code{parallel} package to allow parallel processing}
+  \item{num.cores}{If parallel = TRUE, specify how many cores are going to be used}
   \item{xreg}{When \code{fmethod = "arima"}, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
   \item{newxreg}{When \code{fmethod = "arima"}, a vector or matrix of external regressors, which must have the same number of rows as the original univariate time series}
   \item{...}{Other arguments passing to \code{\link[forecast]{ets}} or \code{\link[forecast]{auto.arima}}}
@@ -44,13 +58,13 @@ Gross, C. and Sohl, J. (1990) Dissagregation methods to expedite product line fo
 \emph{Journal of Forecasting}, \bold{9}, 233-254.
 }
 
-\author{Rob J Hyndman and Roman A Ahmed}
+\author{Earo Wang and Rob J Hyndman}
 
 \seealso{
  \code{\link[hts]{hts}}, \code{\link[hts]{gts}}, \code{\link[hts]{plot.gts}}, \code{\link[hts]{accuracy.gts}}
 }
 \examples{
-forecast(htseg1, h = 10, method = "bu")
+forecast(htseg1, h = 10, method = "bu", fmethod = "arima")
 }
 \keyword{ts}
 

@@ -1,124 +1,159 @@
-## Function to make grouped time series
-## y contains series at completely disaggregated level
-## g contains group information (not necessarily hierarchical)
-
-gts <- function(y, g, hierarchical=FALSE)
-{
+hts <- function(y, nodes, bnames = colnames(y), characters) {
+  # Construct the hierarchical time series.
+  # 
+  # Args:
+  #   y*: The bottom time series assigned by the user. Same lengths and no NA.
+  #   nodes: A list contains the number of child nodes for each level except
+  #     for the bottom one. If missing, it's assumed to have only one level.
+  #   bnames: The names of the bottom time series.
+  #   characters: Define how to split the "bnames" in order to construct the
+  #     level labels. Otherwise, use the defaul labelling system.
+  #
+  # Returns:
+  #   A hierarchical time series.
+  #
+  # ToDo:
+  #   1. May handle NA's by forecasting them properly.
+  #
+  # Error handling:
   y <- as.ts(y)
-  tsp.y <- tsp(y)
-  if(is.null(tsp.y))
-    stop("Not time series data")
-  y <- as.matrix(y)
-  g <- as.matrix(g)
-  if(ncol(g) == 1)
-    g <- matrix(g, nrow = 1)
-  # Check top row
-  if(!(sum(g[1,])==ncol(g) & sum(abs(g[1,]-1)) < 1e-8))
-    g <- rbind(rep(1,ncol(g)),g)
-  # Check last row complete
-  bottom <- unique(g[nrow(g),])
-  if(length(bottom) != ncol(g))
-    g <- rbind(g,1:ncol(g))
-  # Remove duplicate rows
-  z <- rnorm(ncol(g),0,1)
-  z <- g %*% z
-  g <- g[!duplicated(z[,1]),]
-  
-  # Count groups at each level
-  m <- apply(g, 1, function(x){length(unique(x))})
-  # Add attributes to y
-  y <- ts(y, start = tsp.y[1], frequency = tsp.y[3])
-  colnames(g) <- colnames(y)
-  rownames(g) <- paste("Level", 0:(nrow(g) - 1))
-  class(g) <- "gmatrix"
-  # Return gts object
-  return(structure(list(y = y, g = g, m = m, hierarchical=hierarchical), class = "gts"))
-}
 
-## Function to make hierarchical time series
-## y contains series at lowest level
-## g contains group information assumed to be hierarchical
-## This retained for backwards compatibility only.
-hts <- function(y, g)
-{
-  g <- as.matrix(g)
-  if(ncol(g) == 1)
-    g <- matrix(g, nrow=1)
-  g <- make.groups(g)
-  return(gts(y, g, hierarchical=TRUE))
-}
-
-# Construct hierarchical time series
-# data gives the value of the factors for the hierarchy in order.
-make.groups <- function(data)
-{
-  # Check if already created group matrix
-  if(is.element("gmatrix",class(data)))
-      return(data)
-  nv <- nrow(data)
-  g <- matrix(1,nrow=nv+1,ncol=ncol(data))
-  vars <- rownames(data)
-  if (length(vars) == 0)
-    vars = 1:nrow(g)
-  else
-  {
-    j <- vars==""
-    if(sum(j)>0)
-      rownames(data)[j] <- vars[j] <- (1:nrow(g))[j]
+  if (ncol(y) <= 1L) {
+    stop("Argument y must be a multivariate time series.")
   }
-  fac <- ""
-  for(i in 1:nv)
-  {
-    fac <- paste(fac,data[vars[i],])
-    g[i+1,] <- as.numeric(as.factor(fac))
+  if (missing(nodes)) {
+    nodes <- list(ncol(y))
+  } 
+  if (!is.list(nodes)) {
+    stop("Argument nodes must be a list.")
+  } 
+  if (length(nodes[[1L]]) != 1L) {
+    stop("The root node cannot be empty.")
   }
-  return(structure(g,class=c("gmatrix","matrix")))
-}
-
-is.gts <- function(x)
-{
-  is.element("gts",class(x))
-}
-
-print.gts <- function(x,...)
-{
-  fcasts <- !is.null(x$oldy)
-  if(x$hierarchical)
-    cat("Hierarchical Time Series")
-  else
-    cat("Grouped Time Series")
-  if(fcasts)
-    cat(" Forecasts")
-
-  cat("\n  ",length(x$m),"Levels")
-  cat("\n   Number of groups at each level:",x$m)
-  cat("\n   Total number of series:",sum(x$m))
-  if(!fcasts)
-    cat("\n   Number of observations per series:",nrow(x$y),"\n")
-  else
-    cat("\n   Number of observations in each historical series", nrow(x$oldy),"\n")
-
-  cat("\n   Top level series:\n")
-  print(toplevel(x,forecasts=FALSE))
-
-  if(fcasts)
-  {
-    cat("\n   Number of forecasts per series:", nrow(x$y), "\n")    
-    cat("\n   Top level series of forecasts:\n")
-    print(toplevel(x))
+  if (sum(nodes[[length(nodes)]]) != ncol(y)) {
+    stop("The number of terminal nodes is not consistent with the number of bottom time series.")
+  }
+  if (length(nodes) > 1L) {
+    for (i in 1L:(length(nodes) - 1L)) {
+      if (sum(nodes[[i]]) != length(nodes[[i + 1]])) {
+        error <- sprintf("The number of nodes for the level %i is not equal to the number of series of level %i.", i - 1L, i)
+        stop(error)
+      }
+    }
   }
 
+  # Construct the level labels
+  if (missing(characters)) {
+    message("Since argument characters are not specified, the default labelling system is used.")
+    if (is.null(bnames)) {
+      labels <- HierName(nodes) # HierName() defined below
+      colnames(y) <- unlist(labels[length(labels)])
+    } else {  # Keep bts names if specified
+      hn <- HierName(nodes)
+      last.label <- paste("Level", length(nodes))
+      b.list <- list(bnames)
+      names(b.list) <- last.label
+      if (length(hn) == 1L) {  # In case of a simple hierarchy of 2 levels
+        labels <- c(hn, b.list)
+      } else {
+        labels <- c(hn[-length(hn)], b.list)
+      }
+    }
+  } else if (length(characters) != length(nodes)) {
+    stop("Argument characters is misspecified.")
+  } else {
+    # Construct labels based on characters
+    characters <- as.integer(characters)
+    end <- cumsum(characters)
+    start <- end - characters + 1L
+    token <- sapply(bnames, function(x) substring(x, start, end))
+    labels.mat <- matrix(, nrow = nrow(token), ncol = ncol(token))
+    labels.mat[1L, ] <- token[1L, ]
+    for (i in 2L:nrow(labels.mat)) {
+      labels.mat[i, ] <- paste0(labels.mat[i - 1, ], token[i, ])
+    }
+    rownames(labels.mat) <- paste("Level", 1L:nrow(labels.mat))
+    labels <- c("Level 0" = "Total", apply(labels.mat, 1, unique))
+  }
 
+  # Obtain other information
+  names(nodes) <- paste("Level", 0L:(length(nodes) - 1L))
+
+  output <- structure(list(bts = y, nodes = nodes, labels = labels), 
+                      class = c("gts", "hts"))
+  return(output)
 }
 
- # Construct top level series
- # If forecasts=FALSE, return historical values.
-toplevel <- function(object, forecasts=TRUE)
-{ 
-  if(!forecasts & !is.null(object$oldy))
-    y <- object$oldy
-  else
-    y <- object$y
-  tsp.y <- tsp(y)
-  return(ts(rowSums(y), start = tsp.y[1], frequency = tsp.y[3]))
+
+# A function to convert the nodes list to gmatrix
+GmatrixH <- function(xlist) {
+  l.xlist <- length(xlist)
+  num.bts <- sum(xlist[[l.xlist]])
+  nlist <- unlist(lapply(xlist, length))
+  # Create an empty matrix to contain the gmatrix
+  gmat <- matrix(, nrow = l.xlist, ncol = num.bts)
+  # Insert the bottom level
+  gmat[nrow(gmat), ] <- seq(1L, num.bts)
+  # Insert the middle levels in the reverse order
+  if (l.xlist > 1L) {
+    repcount <- xlist[[l.xlist]]
+    for (i in (l.xlist - 1L):1L) {
+      gmat[i, ] <- rep(1L:nlist[i + 1], repcount)
+      repcount <- rowsum(repcount, rep(1L:nlist[i], xlist[[i]]))
+    }
+  }
+  # Insert the top level
+  gmat <- rbind(rep(1L, num.bts), gmat)
+
+  dimnames(gmat) <- list(paste("Level", 0L:(nrow(gmat) - 1L)), colnames(xlist))
+  class(gmat) <- "gmatrix"
+  return(gmat)
+}
+
+
+# A function to return the NO. of nodes at each level
+Mnodes <- function(xlist) {
+  m <- c(unlist(lapply(xlist, length)), sum(xlist[[length(xlist)]]))
+  return(m)
+}
+
+
+# A function to get the inverse of row sums of Smatrix
+InvS4h <- function(xlist) {
+  gmat <- GmatrixH(xlist)
+  uniq <- apply(gmat, 1, unique)
+  len <- nrow(gmat)
+  inv.s <- vector(length = len, mode = "list")
+  for (i in 1L:len) {
+    inv.s[[i]] <- sapply(uniq[[i]], function(x) length(gmat[i, gmat[i, ] == x]))
+  }
+  inv.s <- 1/unlist(inv.s)
+  return(inv.s)
+}
+
+
+# A function to set the default hierarchical names
+HierName <- function(xlist) {
+  l.xlist <- length(xlist)
+  if (l.xlist == 1L) {
+    names.list <- list("Level 0" = "Total")
+  } else {
+    names.list <- list(length = l.xlist)
+    names.list[[1L]] <- LETTERS[1L:xlist[[1L]]]
+    for (i in 2L:l.xlist) {
+      # Grab the individual letters at each level
+      ind <- unlist(sapply(xlist[[i]], function(x) LETTERS[1:x]))
+      # Recursively paste
+      names.list[[i]] <- paste0(rep(names.list[[i - 1]], xlist[[i]]), ind)
+    }
+    names(names.list) <- paste("Level", 1L:l.xlist)
+    names.list <- c("Level 0" = "Total", names.list)
+  }
+  return(names.list)
+}
+
+
+# A function to check whether it's the "hts" class.
+is.hts <- function(xts) {
+  is.element("hts", class(xts))
 }

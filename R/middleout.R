@@ -1,52 +1,56 @@
-middleout <- function (data, h, level, positive = FALSE, fmethod, ...) 
-{
-  # Simple special cases at top and bottom levels
-  if (level == length(data$m)) 
-    return(forecast.gts(data, h = h, positive = positive, method = "bu", fmethod = fmethod, ...))
-  else if (level == 1) 
-    return(forecast.gts(data, h = h, positive = positive, method = "tdfp", fmethod = fmethod, ...))
-  else if (level < 1 | level > length(data$m))
-    stop("level outside the allowable range")
-
-# Proceed if genuinely at middle level
-  ntrees <- data$m[level]
-  fcast <- NULL
-  if(h == 1)
-  {
-    for (i in 1:ntrees) 
-    {
-      j <- data$g[level,] == i
-      x <- hts(data$y[,j], fix.groups(data$g[level:nrow(data$g),j]))
-      fcast <- matrix(c(fcast, forecast(x, h = h, positive = positive, 
-         method = "tdfp", fmethod = fmethod, ...)$y), nrow = 1)
-    }
+MiddleOut <- function(fcasts, nodes) {
+  # Middle-out forecasts similar to tdfp
+  levels <- c(0L, cumsum(sapply(nodes, sum)))
+  # Split fcasts to a list
+  l.levels <- length(levels) - 1L
+  flist <- vector(length = l.levels, mode = "list")
+  for (i in 1L:l.levels) {
+    end <- levels[i + 1L]
+    start <- levels[i] + 1L
+    series <- seq(start, end)
+    flist[[i]] <- fcasts[, series]
   }
-  if(h>1)
-  {
-    for (i in 1:ntrees) 
-    {
-      j <- data$g[level, ] == i
-      x <- hts(data$y[, j], fix.groups(data$g[level:nrow(data$g),j]))            
-      fcast <- cbind(fcast, forecast(x, h = h, positive = positive, 
-          method = "tdfp", fmethod = fmethod, ...)$y)
+  if (is.vector(flist[[1L]])) {  # In case of h = 1
+    new.flist <- vector(length = l.levels - 1L, mode = "list")
+    for (j in 1L:(l.levels - 1L)) {
+      repcount <- rep(1:length(nodes[[j + 1L]]), nodes[[j + 1L]])
+      new.flist[[j]] <- rowsum(flist[[j + 1L]], repcount)
     }
+    tmp <- rep(new.flist[[1L]], nodes[[2L]])
+    # Calculate proportions
+    prop <- flist[[2L]]/tmp
+    mfcasts0 <- unlist(flist[[1L]])
+    mfcasts <- rep(mfcasts0, nodes[[2L]])
+    if (l.levels > 2L) {
+      for (k in 2L:(l.levels - 1L)) {
+        prop <- rep(prop, nodes[[k + 1L]])
+        newprop <- rep(new.flist[[k]], nodes[[k + 1L]])
+        mfcasts <- rep(mfcasts, nodes[[k + 1L]])
+        prop <- prop * flist[[k + 1L]]/newprop
+      }
+    }
+    out <- t(mfcasts * prop)
+  } else {
+    new.flist <- vector(length = l.levels - 1L, mode = "list")
+    for (j in 1L:(l.levels - 1L)) {
+      repcount <- rep(1:length(nodes[[j + 1L]]), nodes[[j + 1L]])
+      new.flist[[j]] <- t(apply(flist[[j + 1L]], 1,
+                                function(x) rowsum(x, repcount)))
+    }
+    tmp <- t(apply(new.flist[[1L]], 1, function(x) rep(x, nodes[[2L]])))
+    prop <- flist[[2L]]/tmp
+    mfcasts0 <- matrix(unlist(flist[[1L]]), ncol = ncol(flist[[1L]]))
+    mfcasts <- t(apply(mfcasts0, 1, function(x) rep(x, nodes[[2L]])))
+    if (l.levels > 2L) {
+      for (k in 2L:(l.levels - 1L)) {
+        prop <- t(apply(prop, 1, function(x) rep(x, nodes[[k + 1L]])))
+        newprop <- t(apply(new.flist[[k]], 1, 
+                           function(x) rep(x, nodes[[k + 1L]])))
+        mfcasts <- t(apply(mfcasts, 1, function(x) rep(x, nodes[[k + 1L]])))
+        prop <- prop * flist[[k + 1L]]/newprop
+      }
+    }
+    out <- mfcasts * prop
   }
-
-# Construct result
-  fcast <- ts(fcast, frequency = frequency(data$y), start = tsp(data$y)[2] + 1/frequency(data$y))
-  colnames(fcast) <- colnames(data$y)
-  data$oldy <- data$y
-  data$y <- fcast
-  return(data)
-}
-
-
-# Fix group matrix so it has the lowest possible integers
-fix.groups <- function(g)
-{
-  if(class(g) == "numeric")
-    g <- matrix(g, ncol=1)
-  for(i in 1:nrow(g))
-    g[i,] <- as.numeric(as.factor(g[i,]))
-  return(g)
+  return(out)
 }
