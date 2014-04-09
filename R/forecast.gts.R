@@ -72,7 +72,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
   }
 
   # Set up forecast methods
-  if (method == "comb" || method == "tdfp") { # Combination or tdfp
+  if (any(method == c("comb", "tdfp"))) { # Combination or tdfp
     y <- aggts(object)  # Grab all ts
   } else if (method == "bu") {  # Bottom-up approach
     y <- object$bts  # Only grab the bts
@@ -84,26 +84,23 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
 
   # loop function to grab pf, fitted, resid
   loopfn <- function(x, ...) {  
+    out <- list()
     if (fmethod == "ets") {
       models <- ets(x, lambda = lambda, ...)
-      pfcasts <- forecast(models, h = h, PI = FALSE)$mean
+      out$pfcasts <- forecast(models, h = h, PI = FALSE)$mean
     } else if (fmethod == "arima") {
       models <- auto.arima(x, lambda = lambda, xreg = xreg, 
                            parallel = FALSE, ...)
-      pfcasts <- forecast(models, h = h, xreg = newxreg, PI = FALSE)$mean
+      out$pfcasts <- forecast(models, h = h, xreg = newxreg, PI = FALSE)$mean
     } else if (fmethod == "rw") {
       models <- rwf(x, h = h, lambda = lambda, ...)
-      pfcasts <- models$mean
+      out$pfcasts <- models$mean
     }
-    out <- list()
-    out$pfcasts <- pfcasts
     if (keep.fitted) {
-      fits <- fitted(models)
-      out$fitted <- fits
+      out$fitted <- fitted(models)
     }
     if (keep.resid) {
-      resid <- residuals(models)
-      out$resid <- resid
+      out$resid <- residuals(models)
     }
     return(out)
   }
@@ -150,6 +147,9 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
       } else {
         wvec <- InvS4g(object$groups)
       }
+    } else if (weights == "sd") {
+      resid <- y - fits
+      wvec <- 1/sqrt(colMeans(resid^2, na.rm = TRUE))
     }
   }
 
@@ -165,34 +165,22 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
   if (method == "comb") {
     if (weights == "none") {
       bfcasts <- Comb(pfcasts, keep = "bottom")
-    } else if (weights == "sd") {
-      resid <- y - fits
-      wvec <- 1/apply(resid, 2, sd, na.rm = TRUE)
+    } else if (any(weights == c("sd", "nseries"))) {
       bfcasts <- Comb(pfcasts, weights = wvec, keep = "bottom")
-    } else if (weights == "nseries") {
-      bfcasts <- Comb(pfcasts, weights = wvec, keep = "bottom")
-    }
+    } 
     if (keep.fitted) {
       if (weights == "none") {
         fits <- Comb(fits, keep = "bottom")
-      } else if (weights == "sd") {
-        resid <- y - fits
-        wvec <- 1/apply(resid, 2, sd, na.rm = TRUE)
+      } else if (any(weights == c("sd", "nseries"))) {
         fits <- Comb(fits, weights = wvec, keep = "bottom")
-      } else if (weights == "nseries") {
-        fits <- Comb(fits, weights = wvec, keep = "bottom")
-      }
+      } 
     }
     if (keep.resid) {
       if (weights == "none") {
         resid <- Comb(resid, keep = "bottom")
-      } else if (weights == "sd") {
-        resid <- y - fits
-        wvec <- 1/apply(resid, 2, sd, na.rm = TRUE)
+      } else if (any(weights == c("sd", "nseries"))) {
         resid <- Comb(resid, weights = wvec, keep = "bottom")
-      } else if (weights == "nseries") {
-        resid <- Comb(resid, weights = wvec, keep = "bottom")
-      }
+      } 
     }
   } else if (method == "bu") {
     bfcasts <- pfcasts
