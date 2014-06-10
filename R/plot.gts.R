@@ -24,9 +24,10 @@ plot.gts <- function(x, include, levels, labels = TRUE, ...) {
 
   if (missing(include)) {
     histx <- histx
-    include <- end(histx)[1L] - start(histx)[1L] + 1L
+    include <- nrow(histx)
   } else {
-    histx <- window(histx, start = end(histx)[1L] - include + 1L)
+    tspx <- tsp(histx)
+    histx <- window(histx, start = tspx[2L] - include/tspx[3L] + 1L/tspx[3L])
   }
 
   if (missing(levels)) {
@@ -70,7 +71,8 @@ plot.gts <- function(x, include, levels, labels = TRUE, ...) {
     }
     plot(histx[, series, drop = FALSE], col = cols, xlim = xlim, ylim = ylim, 
          xlab = "", ylab = "", main = names(x$labels)[levels][i], 
-         plot.type = "single", type = ifelse(include == 1L, "p", "l"), ...)
+         plot.type = "single", type = ifelse(length(1:include) == 1L, "p", "l"), 
+         ...)
 
     if (!is.null(x$histy)) {
       for (j in 1L:length(series)) {
@@ -80,9 +82,7 @@ plot.gts <- function(x, include, levels, labels = TRUE, ...) {
     }
 
     if (labels) {
-      num.chars <- nchar(unlist(x$labels)[series])
-      adj.pos <- max(num.chars/min(num.chars))
-      text(x = tsp(histx)[1L] + adj.pos + 0.5, y = histx[1L, series],
+      text(x = tsp(histx)[1L] + 0.1, y = histx[1L, series] + 0.2,
            labels = unlist(x$labels[levels][i]), 
            cex = 0.9, adj = 1)
     }

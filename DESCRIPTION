@@ -1,9 +1,9 @@
 Package: hts
 Type: Package
 Title: Hierarchical and grouped time series
-Version: 4.2
+Version: 4.3
 Depends: forecast (>= 5.0)
-Imports: SparseM, parallel
+Imports: SparseM, parallel, utils
 Suggests: testthat
 LazyLoad: yes
 LazyData: yes
@@ -12,7 +12,7 @@ Maintainer: Rob J Hyndman <Rob.Hyndman@monash.edu>
 BugReports: https://github.com/robjhyndman/hts/issues
 Description: Methods for analysing and forecasting hierarchical and grouped time series.
 License: GPL (>= 2)
-Packaged: 2014-04-09 12:22:46 UTC; hyndman
+Packaged: 2014-06-10 04:40:47 UTC; hyndman
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-04-09 14:42:56
+Date/Publication: 2014-06-10 07:11:08
