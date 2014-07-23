@@ -6,7 +6,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
                          keep.fitted = FALSE, keep.resid = FALSE,
                          positive = FALSE, lambda = NULL, level, 
                          weights = c("sd", "none", "nseries"),
-                         parallel = FALSE, num.cores = 2,
+                         parallel = FALSE, num.cores = 2, FUN = NULL,
                          xreg = NULL, newxreg = NULL, ...) {
   # Forecast hts or gts objects
   #
@@ -22,8 +22,10 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
   # Return:
   #   Point forecasts with other info chosen by the user.
   method <- match.arg(method)
-  fmethod <- match.arg(fmethod)
   weights <- match.arg(weights)
+  if (is.null(FUN)) {
+    fmethod <- match.arg(fmethod)
+  }
   # Error Handling:
   if (!is.gts(object)) {
     stop("Argument object must be either a hts or gts object.")
@@ -85,16 +87,21 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
   # loop function to grab pf, fitted, resid
   loopfn <- function(x, ...) {  
     out <- list()
-    if (fmethod == "ets") {
-      models <- ets(x, lambda = lambda, ...)
-      out$pfcasts <- forecast(models, h = h, PI = FALSE)$mean
-    } else if (fmethod == "arima") {
-      models <- auto.arima(x, lambda = lambda, xreg = xreg, 
-                           parallel = FALSE, ...)
-      out$pfcasts <- forecast(models, h = h, xreg = newxreg, PI = FALSE)$mean
-    } else if (fmethod == "rw") {
-      models <- rwf(x, h = h, lambda = lambda, ...)
-      out$pfcasts <- models$mean
+    if (is.null(FUN)) {
+      if (fmethod == "ets") {
+        models <- ets(x, lambda = lambda, ...)
+        out$pfcasts <- forecast(models, h = h, PI = FALSE)$mean
+      } else if (fmethod == "arima") {
+        models <- auto.arima(x, lambda = lambda, xreg = xreg, 
+                             parallel = FALSE, ...)
+        out$pfcasts <- forecast(models, h = h, xreg = newxreg)$mean
+      } else if (fmethod == "rw") {
+        models <- rwf(x, h = h, lambda = lambda, ...)
+        out$pfcasts <- models$mean
+      }
+    } else { # user defined function to produce point forecasts
+      models <- FUN(x, ...)
+      out$pfcasts <- forecast(models, h = h)$mean
     }
     if (keep.fitted) {
       out$fitted <- fitted(models)
@@ -148,8 +155,8 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
         wvec <- InvS4g(object$groups)
       }
     } else if (weights == "sd") {
-      resid <- y - fits
-      wvec <- 1/sqrt(colMeans(resid^2, na.rm = TRUE))
+      tmp.resid <- y - fits # it ensures resids are additive errors
+      wvec <- 1/sqrt(colMeans(tmp.resid^2, na.rm = TRUE))
     }
   }
 
@@ -228,6 +235,9 @@ forecast.gts <- function(object, h = ifelse(frequency(object) > 1L,
   bfcasts <- ts(bfcasts, start = tsp.y[2L] + 1L/tsp.y[3L], 
                 frequency = tsp.y[3L])
   colnames(bfcasts) <- bnames
+  class(bfcasts) <- class(object$bts)
+  attr(bfcasts, "msts") <- attr(object$bts, "msts")
+
   if (keep.fitted) {
     bfits <- ts(fits, start = tsp.y[2L], frequency = tsp.y[3L])
     colnames(bfits) <- bnames
