@@ -22,5 +22,8 @@ S3method(summary, gts)
 import(forecast)
 import(SparseM)
 import(parallel)
+import(Matrix)
 importFrom("stats", "window")
 importFrom("utils", "combn")
+
+useDynLib(hts)

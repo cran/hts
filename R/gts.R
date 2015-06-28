@@ -24,16 +24,19 @@ gts <- function(y, groups, gnames = rownames(groups), characters) {
     if (missing(groups)) {
       groups <- matrix(c(rep(1L, ncol(y)), seq(1L, ncol(y))), nrow = 2L, 
                      byrow = TRUE)
-      gmat <- groups
     } else if (!is.matrix(groups)) {
       stop("Argument groups must be a matrix.")
     } 
     # Check whether groups is unique
-    bgroup <- unique(apply(groups, 2, paste, collapse = ""))
-    if (ncol(groups) != ncol(y) && length(bgroup) != ncol(y)) {
-      stop("Argument groups is misspecified.")
-    }
+    # But R takes so long to check due to the inefficiency with strings
+    # bgroup <- unique(apply(groups, 2, paste, collapse = ""))
+    # if (ncol(groups) != ncol(y) && length(bgroup) != ncol(y)) {
+    #   stop("Argument groups is misspecified.")
+    # }
   } else {
+    if (length(characters) == 1L) {
+      stop("The argument characters must have length greater than one.")
+    }
     if (!all(nchar(bnames)[1L] == nchar(bnames)[-1L])) {
       stop("The bottom names must be of the same length.")
     }
@@ -43,15 +46,6 @@ gts <- function(y, groups, gnames = rownames(groups), characters) {
     groups <- CreateGmat(bnames, characters)
   }
   # Construct gmatrix
-  groups <- as.matrix(groups)
-  nc.groups <- ncol(groups)
-  if (all(groups[1L, ] == rep(1L, nc.groups))) {
-    groups <- groups[-1L, ]
-  }
-  nr.groups <- nrow(groups)
-  if (all(groups[nr.groups, ] == seq(1L, nc.groups))) {
-    groups <- groups[-nr.groups, ]
-  }
   gmat <- GmatrixG(groups)  # GmatrixG() defined below
 
   # Construct gnames
@@ -92,7 +86,8 @@ GmatrixG <- function(xmat) {
     gmat  <- xmat
   }
   # Insert the first & last rows
-  gmat <- rbind(rep(1L, ncol(xmat)), gmat, seq(1L, ncol(xmat)))
+  nc.xmat <- ncol(xmat)
+  gmat <- rbind(rep(1L, nc.xmat), gmat, seq(1L, nc.xmat))
   gmat <- gmat[!duplicated(gmat), , drop = FALSE] # Remove possible duplicated
   return(structure(gmat, class = "gmatrix"))
 }
@@ -115,7 +110,7 @@ InvS4g <- function(xgroup) {
 }
 
 
-# A function to generate the gmatrix based on bottome names
+# A function to generate the gmatrix based on bottom names
 CreateGmat <- function(bnames, characters) {
   total.len <- length(characters)
   sub.len <- c(0L, lapply(characters, length))
@@ -170,7 +165,7 @@ CreateGmat <- function(bnames, characters) {
     gmatrix <- rbind(gmatrix, new.list[[i]])
   }
   gmatrix <- gmatrix[!duplicated(gmatrix), , drop = FALSE]
-  # Remove bottome names if it has
+  # Remove bottom names if it has
   check <- try(which(gmatrix == bnames, arr.ind = TRUE)[1L, 1L], silent = TRUE)
   if (class(check) != "try-error") {
     gmatrix <- gmatrix[-check, ]
@@ -209,7 +204,7 @@ print.gts <- function(x, ...) {
     cat("Number of forecasts per series:", nrow(x$bts), "\n")
     cat("Top level series of forecasts: \n")
   }
-  topts <- ts(rowSums(x$bts), start = tsp(x$bts)[1L], 
+  topts <- ts(rowSums(x$bts, na.rm = TRUE), start = tsp(x$bts)[1L], 
               frequency = tsp(x$bts)[3L])
   print(topts)
 }
