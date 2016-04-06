@@ -1,19 +1,20 @@
 Package: hts
 Type: Package
 Title: Hierarchical and Grouped Time Series
-Version: 4.5
-Depends: R (>= 3.0.2), forecast (>= 5.0), SparseM, Matrix
-Imports: parallel, utils
+Version: 5.0
+Depends: R (>= 3.0.2), forecast (>= 5.0), SparseM, Matrix, matrixcalc
+Imports: parallel, utils, methods, graphics, grDevices, stats
+Suggests: testthat
 LinkingTo: Rcpp (>= 0.11.0), RcppEigen
 LazyLoad: yes
 LazyData: yes
 ByteCompile: TRUE
-Author: Rob J Hyndman, Earo Wang and Alan Lee with contributions from Shanika Wickramasuriya
+Author: Rob J Hyndman, Earo Wang, Alan Lee, Shanika Wickramasuriya
 Maintainer: Rob J Hyndman <Rob.Hyndman@monash.edu>
 BugReports: https://github.com/robjhyndman/hts/issues
 Description: Methods for analysing and forecasting hierarchical and grouped time series.
 License: GPL (>= 2)
 NeedsCompilation: yes
-Packaged: 2015-06-28 15:31:00 UTC; hyndman
+Packaged: 2016-04-06 05:14:21 UTC; hyndman
 Repository: CRAN
-Date/Publication: 2015-06-29 02:21:32
+Date/Publication: 2016-04-06 09:43:10

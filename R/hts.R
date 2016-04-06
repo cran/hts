@@ -1,6 +1,6 @@
 hts <- function(y, nodes, bnames = colnames(y), characters) {
   # Construct the hierarchical time series.
-  # 
+  #
   # Args:
   #   y*: The bottom time series assigned by the user. Same lengths and no NA.
   #   nodes: A list contains the number of child nodes for each level except
@@ -15,24 +15,25 @@ hts <- function(y, nodes, bnames = colnames(y), characters) {
   #
   # Error handling:
   if (!is.ts(y)) {
-    y <- as.ts(y)
+    y <- stats::as.ts(y)
   }
+  nbts <- ncol(y)
 
-  if (ncol(y) <= 1L) {
+  if (nbts <= 1L) {
     stop("Argument y must be a multivariate time series.")
   }
   if (missing(characters)) { # Arg "characters" not specified
     message("Since argument characters are not specified, the default labelling system is used.")
     if (missing(nodes)) {
-      nodes <- list(ncol(y))
-    } 
+      nodes <- list(nbts)
+    }
     if (!is.list(nodes)) {
       stop("Argument nodes must be a list.")
-    } 
+    }
     if (length(nodes[[1L]]) != 1L) {
       stop("The root node cannot be empty.")
     }
-    if (sum(nodes[[length(nodes)]]) != ncol(y)) {
+    if (sum(nodes[[length(nodes)]]) != nbts) {
       stop("The number of terminal nodes is not consistent with the number of bottom time series.")
     }
     if (length(nodes) > 1L) {
@@ -53,11 +54,12 @@ hts <- function(y, nodes, bnames = colnames(y), characters) {
       last.label <- paste("Level", length(nodes))
       b.list <- list(bnames)
       names(b.list) <- last.label
-      if (length(hn) == 1L) {  # In case of a simple hierarchy of 2 levels
-        labels <- c(hn, b.list)
-      } else {
-        labels <- c(hn[-length(hn)], b.list)
-      }
+      labels <- c(hn[-length(hn)], b.list)
+      # if (length(hn) == 1L) {  # In case of a simple hierarchy of 2 levels
+      #   labels <- c(hn, b.list)
+      # } else {
+      #   labels <- c(hn[-length(hn)], b.list)
+      # }
     }
   } else { # Specified "characters" automates the node structure
     if (!all(nchar(bnames)[1L] == nchar(bnames)[-1L])) {
@@ -69,12 +71,13 @@ hts <- function(y, nodes, bnames = colnames(y), characters) {
     c.nodes <- CreateNodes(bnames, characters)
     nodes <- c.nodes$nodes
     labels <- c.nodes$labels
+    y <- y[, c.nodes$index]
   }
 
   # Obtain other information
   names(nodes) <- paste("Level", 1L:length(nodes))
 
-  output <- structure(list(bts = y, nodes = nodes, labels = labels), 
+  output <- structure(list(bts = y, nodes = nodes, labels = labels),
                       class = c("gts", "hts"))
   return(output)
 }
@@ -130,11 +133,9 @@ InvS4h <- function(xlist) {
 # A function to set the default hierarchical names
 HierName <- function(xlist) {
   l.xlist <- length(xlist)
-  if (l.xlist == 1L) {
-    names.list <- list("Level 0" = "Total")
-  } else {
-    names.list <- list(length = l.xlist)
-    names.list[[1L]] <- LETTERS[1L:xlist[[1L]]]
+  names.list <- list(length = l.xlist)
+  names.list[[1L]] <- LETTERS[1L:xlist[[1L]]]
+  if (l.xlist > 1L) {
     for (i in 2L:l.xlist) {
       # Grab the individual letters at each level
       ind <- unlist(sapply(xlist[[i]], function(x) LETTERS[1:x]))
@@ -142,37 +143,36 @@ HierName <- function(xlist) {
       names.list[[i]] <- paste0(rep(names.list[[i - 1]], xlist[[i]]), ind)
     }
     names(names.list) <- paste("Level", 1L:l.xlist)
-    names.list <- c("Level 0" = "Total", names.list)
   }
+  names.list <- c("Level 0" = "Total", names.list)
   return(names.list)
 }
 
 
 # A function to create nodes based on segmentation of bottom names
+# it also generate index for bottom time series
 CreateNodes <- function(bnames, characters) {
-  # Construct labels based on characters
   characters <- as.integer(characters)
   end <- cumsum(characters)
   start <- end - characters + 1L
-  token <- sapply(bnames, function(x) substring(x, start, end))
-  nr.token <- nrow(token)
-  labels.mat <- matrix(, nrow = nr.token, ncol = ncol(token))
-  nodes <- vector(length = nr.token, mode = "list")
-  labels.mat[1L, ] <- token[1L, ]
-  nodes[[1L]] <- length(unique(labels.mat[1L, ]))
-  for (i in 2L:nr.token) {
-    labels.mat[i, ] <- paste0(labels.mat[i - 1, ], token[i, ])
-    # Create nodes for each level
-    strings <- unique(labels.mat[i, ])
-    prefix <- substr(strings, start = 1L, stop = end[i - 1L])
-    nodes[[i]] <- tapply(strings, factor(prefix, unique(prefix)), length)
-  }
-  rownames(labels.mat) <- paste("Level", 1L:nrow(labels.mat))
-  labels <- c("Level 0" = "Total", apply(labels.mat, 1, unique))
-  out <- list(nodes = nodes, labels = labels)
+  token <- sapply(end, function(x) substring(bnames, 1L, x))
+  nc.token <- ncol(token)
+  unique.str <- apply(token, 2, unique)
+  nodes <- lapply(2L:nc.token, function(x) {
+                    prefix <- substr(unique.str[[x]], start = 1L,
+                                     stop = end[x - 1L])
+                    return(table(prefix, dnn = NULL))
+                      })
+  nodes <- c(length(unique.str[[1L]]), nodes)
+  # Construct labels based on characters
+  names(unique.str) <- paste("Level", 1L:nc.token)
+  extract.levels <- lapply(unique.str, function(x) levels(factor(x)))
+  labels <- c("Level 0" = "Total", extract.levels)
+  # Generate index for bottom time series
+  idx <- match(extract.levels[[nc.token]], token[, nc.token])
+  out <- list(nodes = nodes, labels = labels, index = idx)
   return(out)
 }
-
 
 # A function to check whether it's the "hts" class.
 is.hts <- function(xts) {

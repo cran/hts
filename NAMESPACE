@@ -10,7 +10,8 @@ accuracy.gts,
 plot.gts,
 summary.gts,
 combinef,
-smatrix
+smatrix,
+MinT
 )
 
 S3method(print, gts)
@@ -23,7 +24,13 @@ import(forecast)
 import(SparseM)
 import(parallel)
 import(Matrix)
+import(matrixcalc)
 importFrom("stats", "window")
 importFrom("utils", "combn")
+importFrom("grDevices", "rainbow")
+importFrom("graphics", "lines", "par", "plot", "strwidth", "text")
+importFrom("methods", "as", "new")
+importFrom("stats", "as.ts", "fitted", "frequency", "is.ts", "na.omit",
+           "residuals", "time", "ts", "tsp", "tsp<-")
 
 useDynLib(hts)

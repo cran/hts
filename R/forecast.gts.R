@@ -1,12 +1,12 @@
 forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
-                         2L * frequency(object$bts), 10L), 
-                         method = c("comb", "bu", "mo", 
-                                    "tdgsa", "tdgsf", "tdfp"),
-                         fmethod = c("ets", "arima", "rw"), 
+                         2L * frequency(object$bts), 10L),
+                         method = c("comb", "bu", "mo","tdgsa", "tdgsf", "tdfp"),
+                         weights = c("wls", "ols", "mint", "nseries"),
+                         fmethod = c("ets", "arima", "rw"),
                          algorithms = c("lu", "cg", "chol", "recursive", "slm"),
+                         covariance = c("shr", "sam"),
                          keep.fitted = FALSE, keep.resid = FALSE,
-                         positive = FALSE, lambda = NULL, level, 
-                         weights = c("sd", "none", "nseries"),
+                         positive = FALSE, lambda = NULL, level,
                          parallel = FALSE, num.cores = 2, FUN = NULL,
                          xreg = NULL, newxreg = NULL, ...) {
   # Forecast hts or gts objects
@@ -23,7 +23,16 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   # Return:
   #   Point forecasts with other info chosen by the user.
   method <- match.arg(method)
+  # Recode old weights arguments
+  if(length(weights)==1L)
+  {
+    if(weights=="sd")
+      weights <- "wls"
+    else if(weights=="none")
+      weights <- "ols"
+  }
   weights <- match.arg(weights)
+  covariance <- match.arg(covariance)
   alg <- match.arg(algorithms)
   if (is.null(FUN)) {
     fmethod <- match.arg(fmethod)
@@ -35,7 +44,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   if (h < 1L) {
     stop("Argument h must be positive.")
   }
-  if (!is.hts(object) && 
+  if (!is.hts(object) &&
       is.element(method, c("mo", "tdgsf", "tdgsa", "tdfp"))) {
     stop("Argument method is not appropriate for a non-hierarchical time series.")
   }
@@ -46,7 +55,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   # Set up lambda for arg "positive" when lambda is missing
   if (is.null(lambda)) {
     if (positive) {
-      if (any(object$bts <= 0L)) {
+      if (any(object$bts <= 0L, na.rm=FALSE)) {
         stop("All data must be positive.")
       } else {
         lambda <- 0
@@ -58,7 +67,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
 
   # Remember the original keep.fitted argument for later
   keep.fitted0 <- keep.fitted
-  if (method == "comb" && weights == "sd") {
+  if (method=="comb" && (weights == "mint" || weights == "wls")) {
     keep.fitted <- TRUE
   }
 
@@ -89,14 +98,14 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   }
 
   # loop function to grab pf, fitted, resid
-  loopfn <- function(x, ...) {  
+  loopfn <- function(x, ...) {
     out <- list()
     if (is.null(FUN)) {
       if (fmethod == "ets") {
         models <- ets(x, lambda = lambda, ...)
         out$pfcasts <- forecast(models, h = h, PI = FALSE)$mean
       } else if (fmethod == "arima") {
-        models <- auto.arima(x, lambda = lambda, xreg = xreg, 
+        models <- auto.arima(x, lambda = lambda, xreg = xreg,
                              parallel = FALSE, ...)
         out$pfcasts <- forecast(models, h = h, xreg = newxreg)$mean
       } else if (fmethod == "rw") {
@@ -108,10 +117,10 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
       out$pfcasts <- forecast(models, h = h)$mean
     }
     if (keep.fitted) {
-      out$fitted <- fitted(models)
+      out$fitted <- stats::fitted(models)
     }
     if (keep.resid) {
-      out$resid <- residuals(models)
+      out$resid <- stats::residuals(models)
     }
     return(out)
   }
@@ -125,7 +134,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
     xreg <- xreg
     newxreg <- newxreg
     cl <- makeCluster(num.cores)
-    loopout <- parSapplyLB(cl = cl, X = y, FUN = function(x) loopfn(x, ...), 
+    loopout <- parSapplyLB(cl = cl, X = y, FUN = function(x) loopfn(x, ...),
                            simplify = FALSE)
     stopCluster(cl = cl)
   } else {  # parallel = FALSE
@@ -145,7 +154,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   }
 
   # Set up basic info
-  tsp.y <- tsp(y)
+  tsp.y <- stats::tsp(y)
   bnames <- colnames(object$bts)
 
   if (method == "comb") {  # Assign class
@@ -162,11 +171,15 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
       } else {
         wvec <- InvS4g(object$groups)
       }
-    } else if (weights == "sd") {
+    } else if (weights == "wls") {
       tmp.resid <- y - fits # it ensures resids are additive errors
       wvec <- 1/sqrt(colMeans(tmp.resid^2, na.rm = TRUE))
     }
+    else if (weights == "mint") {
+      tmp.resid <- stats::na.omit(y - fits)
+    }
   }
+
 
   # An internal function to call combinef correctly
   Comb <- function(x, ...) {
@@ -177,34 +190,52 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
     }
   }
 
+  # An internal function to call MinT correctly
+  mint <- function(x, ...) {
+    if (is.hts(x)) {
+      return(MinT(x, nodes = object$nodes, ... ))
+    } else {
+      return(MinT(x, groups = object$groups, ...))
+    }
+  }
+
   if (method == "comb") {
-    if (weights == "none") {
+    if (weights == "ols") {
       bfcasts <- Comb(pfcasts, keep = "bottom", algorithms = alg)
-    } else if (any(weights == c("sd", "nseries"))) {
-      bfcasts <- Comb(pfcasts, weights = wvec, keep = "bottom", 
+    } else if (any(weights == c("wls", "nseries"))) {
+      bfcasts <- Comb(pfcasts, weights = wvec, keep = "bottom",
                       algorithms = alg)
-    } 
-    if (keep.fitted) {
-      if (weights == "none") {
+    } else { # weights=="mint"
+      bfcasts <- mint(pfcasts, residual = tmp.resid,
+                    covariance = covariance, keep = "bottom", algorithms = alg)
+    }
+    if (keep.fitted0) {
+      if (weights == "ols") {
         fits <- Comb(fits, keep = "bottom", algorithms = alg)
-      } else if (any(weights == c("sd", "nseries"))) {
+      } else if (any(weights == c("wls", "nseries"))) {
         fits <- Comb(fits, weights = wvec, keep = "bottom",
                      algorithms = alg)
-      } 
+      } else if(weights=="mint") {
+        fits <- mint(fits, residual = tmp.resid,
+                   covariance = covariance, keep = "bottom", algorithms = alg)
+      }
     }
     if (keep.resid) {
-      if (weights == "none") {
+      if (weights == "ols") {
         resid <- Comb(resid, keep = "bottom", algorithms = alg)
-      } else if (any(weights == c("sd", "nseries"))) {
+      } else if (any(weights == c("wls", "nseries"))) {
         resid <- Comb(resid, weights = wvec, keep = "bottom",
                       algorithms = alg)
-      } 
+      } else if (weights=="mint") {
+        resid <- mint(resid, residual = tmp.resid,
+                    covariance = covariance, keep = "bottom", algorithms = alg)
+      }
     }
   } else if (method == "bu") {
     bfcasts <- pfcasts
   } else if (method == "tdgsa") {
     bfcasts <- TdGsA(pfcasts, object$bts, y)
-    if (keep.fitted) {
+    if (keep.fitted0) {
       fits <- TdGsA(fits, object$bts, y)
     }
     if (keep.resid) {
@@ -212,7 +243,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
     }
   } else if (method == "tdgsf") {
     bfcasts <- TdGsF(pfcasts, object$bts, y)
-    if (keep.fitted) {
+    if (keep.fitted0) {
       fits <- TdGsF(fits, object$bts, y)
     }
     if (keep.resid) {
@@ -220,7 +251,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
     }
   } else if (method == "tdfp") {
     bfcasts <- TdFp(pfcasts, object$nodes)
-    if (keep.fitted) {
+    if (keep.fitted0) {
       fits <- TdFp(fits, object$nodes)
     }
     if (keep.resid) {
@@ -228,7 +259,7 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
     }
   } else if (method == "mo") {
     bfcasts <- MiddleOut(pfcasts, mo.nodes)
-    if (keep.fitted) {
+    if (keep.fitted0) {
       fits <- MiddleOut(fits, mo.nodes)
     }
     if (keep.resid) {
@@ -237,22 +268,22 @@ forecast.gts <- function(object, h = ifelse(frequency(object$bts) > 1L,
   }
 
   # In case that accuracy.gts() is called later, since NA's have been omitted
-  # to ensure slm to run without errors.
-  if (method == "comb" && fmethod == "rw" 
-      && keep.fitted == TRUE && !is.hts(object)) {
+  # to ensure slm/chol to run without errors.
+  if (method == "comb" && fmethod == "rw"
+      && keep.fitted0 == TRUE && (alg == "slm" || alg == "chol")) {
     fits <- rbind(rep(NA, ncol(fits)), fits)
   }
 
-  bfcasts <- ts(bfcasts, start = tsp.y[2L] + 1L/tsp.y[3L], 
+  bfcasts <- ts(bfcasts, start = tsp.y[2L] + 1L/tsp.y[3L],
                 frequency = tsp.y[3L])
   colnames(bfcasts) <- bnames
   class(bfcasts) <- class(object$bts)
   attr(bfcasts, "msts") <- attr(object$bts, "msts")
 
-  if (keep.fitted) {
+  if (keep.fitted0) {
     bfits <- ts(fits, start = tsp.y[1L], frequency = tsp.y[3L])
     colnames(bfits) <- bnames
-  } 
+  }
   if (keep.resid) {
     bresid <- ts(resid, start = tsp.y[1L], frequency = tsp.y[3L])
     colnames(bresid) <- bnames
