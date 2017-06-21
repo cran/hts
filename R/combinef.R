@@ -42,7 +42,7 @@
 #' for(i in 1:ncol(ally))
 #' 	allf[,i] <- forecast(auto.arima(ally[,i]), h = h)$mean
 #' allf <- ts(allf, start = 51)
-#' y.f <- combinef(allf, htseg1$nodes, weights = NULL, keep = "gts", algorithms = "lu")
+#' y.f <- combinef(allf, get_nodes(htseg1), weights = NULL, keep = "gts", algorithms = "lu")
 #' plot(y.f)}
 #' 
 #' # gts example
@@ -55,7 +55,7 @@
 #' for(i in 1:ncol(ally))
 #'   allf[,i] <- forecast(auto.arima(ally[,i]),h = h)$mean
 #' allf <- ts(allf, start = 51)
-#' y.f <- combinef(allf, groups = g, keep ="gts", algorithms = "lu")
+#' y.f <- combinef(allf, groups = get_groups(y), keep ="gts", algorithms = "lu")
 #' plot(y.f)}
 #' 
 #' @export combinef
@@ -81,7 +81,7 @@ combinef <- function(fcasts, nodes, groups, weights = NULL,
   cnames <- colnames(fcasts)
   if (missing(groups)) { # hts class
     if (alg == "slm") {
-      stop("The slm algorithm does not support an hts object.")
+      stop("The slm algorithm does not support an hts object.", call. = FALSE)
     }
     totalts <- sum(Mnodes(nodes))
     if (!is.matrix(fcasts)) {
@@ -89,7 +89,7 @@ combinef <- function(fcasts, nodes, groups, weights = NULL,
     }
     h <- nrow(fcasts)
     if (ncol(fcasts) != totalts) {
-      stop("Argument fcasts requires all the forecasts.")
+      stop("Argument fcasts requires all the forecasts.", call. = FALSE)
     }
     if (alg == "recursive") { # only nodes to be needed
       # CombineH only returns bottom time series
@@ -154,14 +154,14 @@ combinef <- function(fcasts, nodes, groups, weights = NULL,
     }
   } else if (missing(nodes)) {  # gts class
     if (alg == "recursive") {
-      stop("The recursive algorithm does not support a gts object.")
+      stop("The recursive algorithm does not support a gts object.", call. = FALSE)
     }
     # To call Smatrix() properly
     rownames(groups) <- NULL
     gmat <- GmatrixG(groups)
     totalts <- sum(Mlevel(gmat))
     if (ncol(fcasts) != totalts) {
-      stop("Argument fcasts requires all the forecasts.")
+      stop("Argument fcasts requires all the forecasts.", call. = FALSE)
     }
     fcasts <- t(fcasts)
     if (alg == "chol") {

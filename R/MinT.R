@@ -18,7 +18,7 @@ lowerD <- function(x)
 shrink.estim <- function(x, tar)
 {
   if (is.matrix(x) == TRUE && is.numeric(x) == FALSE)
-    stop("The data matrix must be numeric!")
+    stop("The data matrix must be numeric!", call. = FALSE)
   p <- ncol(x)
   n <- nrow(x)
   covm <- crossprod(x) / n
@@ -107,8 +107,12 @@ shrink.estim <- function(x, tar)
 #'   res[, i] <- na.omit(ally[, i] - fitted(fit))
 #' }
 #' allf <- ts(allf, start = 51)
-#' y.f <- MinT(allf, htseg1$nodes, residual = res, covariance = "shr", keep = "gts", algorithms = "lu")
-#' plot(y.f)}
+#' y.f <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr", 
+#'   keep = "gts", algorithms = "lu")
+#' plot(y.f)
+#' y.f_cg <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr", 
+#'   keep = "all", algorithms = "cg")
+#' }
 #'   
 #' # gts example
 #' \dontrun{abc <- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 50))
@@ -127,7 +131,8 @@ shrink.estim <- function(x, tar)
 #'   res[, i] <- na.omit(ally[, i] - fitted(fit))
 #' }
 #' allf <- ts(allf, start = 51)
-#' y.f <- MinT(allf, groups = g, residual = res, covariance = "shr", keep = "gts", algorithms = "lu")
+#' y.f <- MinT(allf, groups = get_groups(y), residual = res, covariance = "shr", 
+#'   keep = "gts", algorithms = "lu")
 #' plot(y.f)}
 #' 
 #' @export MinT
@@ -144,7 +149,7 @@ MinT <- function (fcasts, nodes, groups, residual, covariance = c("shr", "sam"),
 
   if(missing(residual))
   {
-    stop("MinT needs insample residuals.")
+    stop("MinT needs insample residuals.", call. = FALSE)
   }
   if(covar=="sam")
   {
@@ -152,7 +157,7 @@ MinT <- function (fcasts, nodes, groups, residual, covariance = c("shr", "sam"),
     w.1 <- crossprod(res) / n
     if(is.positive.definite(w.1)==FALSE)
     {
-      stop("MinT needs covariance matrix to be positive definite.")
+      stop("MinT needs covariance matrix to be positive definite.", call. = FALSE)
     }
   }else{
     tar <- lowerD(res)
@@ -161,7 +166,7 @@ MinT <- function (fcasts, nodes, groups, residual, covariance = c("shr", "sam"),
     lambda <- shrink[[2]]
     if(is.positive.definite(w.1)==FALSE)
     {
-      stop("MinT needs covariance matrix to be positive definite.")
+      stop("MinT needs covariance matrix to be positive definite.", call. = FALSE)
     }
   }
 
@@ -172,7 +177,7 @@ MinT <- function (fcasts, nodes, groups, residual, covariance = c("shr", "sam"),
     }
     h <- nrow(fcasts)
     if (ncol(fcasts) != totalts) {
-      stop("Argument fcasts requires all the forecasts.")
+      stop("Argument fcasts requires all the forecasts.", call. = FALSE)
     }
     gmat <- GmatrixH(nodes)
     fcasts <- t(fcasts)
@@ -216,7 +221,7 @@ MinT <- function (fcasts, nodes, groups, residual, covariance = c("shr", "sam"),
     gmat <- GmatrixG(groups)
     totalts <- sum(Mlevel(gmat))
     if (ncol(fcasts) != totalts) {
-      stop("Argument fcasts requires all the forecasts.")
+      stop("Argument fcasts requires all the forecasts.", call. = FALSE)
     }
     fcasts <- t(fcasts)
     if (alg == "chol") {
