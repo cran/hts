@@ -1,6 +1,6 @@
-ad9f5e0d10279244951737938b3ed15d *DESCRIPTION
+7415b98bb741463af98c1c7a35a25f43 *DESCRIPTION
 9ac60bda57880b991db405dc2c8ec745 *NAMESPACE
-434a7e23a7a6c6bd8ba5f23f7ac9aea7 *NEWS.md
+f8a22ed40582fb5842011a39bf5f22fb *NEWS.md
 d9a793a1435f1483d7246f3e49467529 *R/MinT.R
 e0390801b0719fc5a1097647a863a052 *R/MinTbpv.R
 73eaab384def3379b3f02b34a791b976 *R/RcppExports.R
@@ -10,10 +10,10 @@ f02fd120cff7873c63343cd7c8c51687 *R/bpv.R
 a3c7837ea6fd13c5b7232bf791329c4b *R/combinef.R
 cb0ea6019e68bc481544b7545b24a4c4 *R/combinefm.R
 f848953ad872279869bddca995401ea9 *R/combineg.R
-6b37748a564fb85f0322c4fe44a97798 *R/forecast-gts.R
+fd5b5b93a0abb47660157fc2d8fcbf03 *R/forecast-gts.R
 d23bac45cf284b84bfac37590318483b *R/gts.R
 d0f4258f6e06f32b83d8839db8568439 *R/hts-package.R
-84d7b87caa255a83a3d67d7da073fb8f *R/hts.R
+44611acb214b65cac1a78589372ae31a *R/hts.R
 18aa394278ccb4c257c4fcd0bd1300b2 *R/imports.R
 0e7a54c821dd1ef0474064f814de4ce3 *R/middleout.R
 e35d1d1e07136f14de52c347f5266dea *R/plot-gts.R
@@ -23,12 +23,12 @@ e35d1d1e07136f14de52c347f5266dea *R/plot-gts.R
 012aaea279f38e50d540f0dc9b12252c *R/tracemin.R
 ba796d86fc02f1802961ebdbebc443b4 *R/window-gts.R
 585418906e1d6f50bf7ec25c38f0a7d9 *README.md
-4d6142e8e3feb989da023f36fd9cdb7d *build/vignette.rds
+caf4cdcf80f6d4c424983bf753cc1926 *build/vignette.rds
 13b3843074a6496ec3cd4cea13c4ee97 *data/htseg1.rda
 e8eba9993e2969e8f8047d1cf05c7b65 *data/htseg2.rda
 cdae3079d7a25b0287ec0609ad9bb470 *data/infantgts.rda
 a30b04da4fbd653274c8ae13d038088c *inst/doc/hts.Rnw
-1976165b24953c12cae1aef436afc7c9 *inst/doc/hts.pdf
+151358c921d1e43044202ee4e19074ff *inst/doc/hts.pdf
 8f01b35c659546a3c8f939aa92697def *inst/docs/hts.pdf
 5bc78007ce2cf5d5d63e51a0865413a9 *man/MinT.Rd
 97a139063f1edd47dec37c6d268393b4 *man/accuracy.gts.Rd
@@ -60,8 +60,8 @@ b1125c3183dc4f4063f95a54f31432ed *man/infantgts.Rd
 fb6b30087a1d9a3d3252e523c859dcee *src/cgm_RcppEigen.cpp
 1e50132b75125a395c3d099f6cc630db *tests/testthat.R
 5564569c209069e970093d8d7437c271 *tests/testthat/test-aggts.R
-cfdd7436768a30223c03c4e005119bfe *tests/testthat/test-combinef.R
-353fee91f39d97e4dea5cabb2f901a6b *tests/testthat/test-forecast.R
+a9dee374bd3437f9a0d2eb979c759e3e *tests/testthat/test-combinef.R
+a2eb10b0b6ad8566ac5e77527b310571 *tests/testthat/test-forecast.R
 f699e60901655ad9ffa9ceaff213606c *tests/testthat/test-gts.R
 1a7aae9f98b4f922945e4cb1da648a68 *tests/testthat/test-hts.R
 867aa7b788ac5385e53c37bca679ac48 *tests/testthat/test-smatrix.R
