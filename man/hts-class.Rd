@@ -64,7 +64,7 @@ x <- hts(abc, nodes)
 
 # Example 2
 # Suppose we've got the bottom names that can be useful for constructing the node
-# structure and the labels at higher levels. We need to specify how to split them 
+# structure and the labels at higher levels. We need to specify how to split them
 # in the argument "characters".
 library(hts)
 abc <- ts(5 + matrix(sort(rnorm(1000)), ncol = 10, nrow = 100))
@@ -77,7 +77,7 @@ y <- hts(abc, characters = c(1, 2, 1))
 Hyndman, R. J., Ahmed, R. A., Athanasopoulos, G., & Shang, H. L.
 (2011). Optimal combination forecasts for hierarchical time series.
 \emph{Computational Statistics and Data Analysis}, \bold{55}(9), 2579--2589.
-\url{http://robjhyndman.com/papers/hierarchical/}
+\url{https://robjhyndman.com/publications/hierarchical/}
 }
 \seealso{
 \code{\link[hts]{gts}}, \code{\link[hts]{accuracy.gts}},

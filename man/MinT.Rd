@@ -73,7 +73,7 @@ The \code{control.nn} argument is a list that can supply any of the following co
 
 # hts example
 \dontrun{
-h <- 12 
+h <- 12
 ally <- aggts(htseg1)
 n <- nrow(ally)
 p <- ncol(ally)
@@ -86,10 +86,10 @@ for(i in 1:p)
   res[, i] <- na.omit(ally[, i] - fitted(fit))
 }
 allf <- ts(allf, start = 51)
-y.f <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr", 
+y.f <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr",
   keep = "gts", algorithms = "lu")
 plot(y.f)
-y.f_cg <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr", 
+y.f_cg <- MinT(allf, get_nodes(htseg1), residual = res, covariance = "shr",
   keep = "all", algorithms = "cg")
 }
 
@@ -108,7 +108,7 @@ b.f <- MinT(allf, get_nodes(htseg2), residual = res, covariance = "shr",
 b.nnf <-  MinT(allf, get_nodes(htseg2), residual = res, covariance = "shr",
   keep = "bottom", algorithms = "lu", nonnegative = TRUE, parallel = TRUE)
 }
-  
+
 # gts example
 \dontrun{
 abc <- ts(5 + matrix(sort(rnorm(200)), ncol = 4, nrow = 50))
@@ -127,7 +127,7 @@ for(i in 1:p)
   res[, i] <- na.omit(ally[, i] - fitted(fit))
 }
 allf <- ts(allf, start = 51)
-y.f <- MinT(allf, groups = get_groups(y), residual = res, covariance = "shr", 
+y.f <- MinT(allf, groups = get_groups(y), residual = res, covariance = "shr",
   keep = "gts", algorithms = "lu")
 plot(y.f)
 }
@@ -135,7 +135,7 @@ plot(y.f)
 \references{
 Wickramasuriya, S. L., Athanasopoulos, G., & Hyndman, R. J. (2019).
 Optimal forecast reconciliation for hierarchical and grouped time series through trace minimization.
-\emph{Journal of the American Statistical Association}, \bold{114}(526), 804--819. \url{http://robjhyndman.com/working-papers/mint/}
+\emph{Journal of the American Statistical Association}, \bold{114}(526), 804--819. \url{https://robjhyndman.com/working-papers/mint/}
 
 Wickramasuriya, S. L., Turlach, B. A., & Hyndman, R. J. (to appear). Optimal non-negative forecast reconciliation.
 \emph{Statistics and Computing}. \url{https://robjhyndman.com/publications/nnmint/}
@@ -143,7 +143,7 @@ Wickramasuriya, S. L., Turlach, B. A., & Hyndman, R. J. (to appear). Optimal non
 Hyndman, R. J., Lee, A., & Wang, E. (2016).  Fast computation of reconciled
 forecasts for hierarchical and grouped time series.  \emph{Computational
 Statistics and Data Analysis}, \bold{97}, 16--32.
-\url{http://robjhyndman.com/papers/hgts/}
+\url{https://robjhyndman.com/publications/hgts/}
 }
 \seealso{
 \code{\link[hts]{hts}}, \code{\link[hts]{gts}},

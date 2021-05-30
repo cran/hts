@@ -82,9 +82,9 @@ x <- gts(abc, groups = gc)
 y <- gts(abc, groups = gn)
 
 # Example 2 with two simple hierarchies (geography and product) to show the argument "characters"
-bnames1 <- c("VICMelbAA", "VICMelbAB", "VICGeelAA", "VICGeelAB",  
+bnames1 <- c("VICMelbAA", "VICMelbAB", "VICGeelAA", "VICGeelAB",
              "VICMelbBA", "VICMelbBB", "VICGeelBA", "VICGeelBB",
-             "NSWSyndAA", "NSWSyndAB", "NSWWollAA", "NSWWollAB", 
+             "NSWSyndAA", "NSWSyndAB", "NSWWollAA", "NSWWollAB",
              "NSWSyndBA", "NSWSyndBB", "NSWWollBA", "NSWWollBB")
 bts1 <- matrix(ts(rnorm(160)), ncol = 16)
 colnames(bts1) <- bnames1
@@ -102,7 +102,7 @@ x2 <- gts(bts2, characters = c(3, 1, 1))
 Hyndman, R. J., Ahmed, R. A., Athanasopoulos, G., & Shang, H. L.
 (2011). Optimal combination forecasts for hierarchical time series.
 \emph{Computational Statistics and Data Analysis}, \bold{55}(9), 2579--2589.
-\url{http://robjhyndman.com/papers/hierarchical/}
+\url{https://robjhyndman.com/publications/hierarchical/}
 }
 \seealso{
 \code{\link[hts]{hts}}, \code{\link[hts]{accuracy.gts}},
